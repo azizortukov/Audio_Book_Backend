@@ -1,103 +1,90 @@
 package uz.audio_book.backend.controller;
 
-
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import uz.audio_book.backend.config.JwtUtil;
 import uz.audio_book.backend.dto.LoginDto;
 import uz.audio_book.backend.dto.SignUpDto;
-import uz.audio_book.backend.dto.TokenDto;
-import uz.audio_book.backend.entity.User;
-import uz.audio_book.backend.service.UserServiceImpl;
-import java.util.Optional;
+import uz.audio_book.backend.service.JwtService;
 
+@PreAuthorize("hasRole('USER')")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/auth")
+@Tag(name = "Authentication API", description = "(For Sign Up, Login, sending code and getting refresh & access token)")
 public class AuthController {
 
-    private final AuthenticationManager authenticationManager;
-    private final JwtUtil jwtUtil;
-    private final UserServiceImpl userServiceImpl;
+    private final JwtService jwtService;
 
+    @Operation(
+            summary = "Sign up page API",
+            description = """
+            This API receives user details json and verification code is not needed. This API always sends
+            token, because its new user. Please save that token as 'TempAuthentication' because security will
+            get token from you in other page in that name. Please check email and password for format before
+            requesting this API""")
     @PostMapping("/sign-up")
-    public HttpEntity<?> login(@RequestBody SignUpDto signUpDto) {
-        return ResponseEntity.ok(jwtUtil.generateVerificationCodeToken(signUpDto));
+    public HttpEntity<?> signUp(@RequestBody SignUpDto signUpDto) {
+        return jwtService.giveAccountDetailsToken(signUpDto);
     }
 
+    @Operation(
+            summary = "Code verification page API",
+            description = """
+            This API requires TempAuthentication token, then the code that user has typed. The response will
+            be either 200 with two tokens which are access token and refresh token or 400 (bad request) with
+            its message in body""")
     @PostMapping("/sign-up/verify")
-    public HttpEntity<?> verify(@RequestBody String verificationCode, HttpServletRequest request) {
-        String confirmation = request.getHeader("TempAuthorization");
-        if (confirmation == null || !confirmation.startsWith("Confirmation")) {
-            return ResponseEntity.badRequest().build();
-        }
-        String token = confirmation.substring(13);
-        if (jwtUtil.checkVerificationCodeFromDto(verificationCode, token)) {
-            User user = userServiceImpl.saveUserFromDto(jwtUtil.getDtoFromToken(token));
-            return ResponseEntity.ok(new TokenDto(
-                    jwtUtil.genToken(user),
-                    jwtUtil.genRefreshToken(user)));
-        } else {
-            return ResponseEntity.badRequest().build();
-        }
+    public HttpEntity<?> signUpVerify(@RequestBody String verificationCode, HttpServletRequest request) {
+        return jwtService.signUpVerifyCode(verificationCode, request);
     }
 
+    @Operation(
+            summary = "Code verification page API",
+            description = """
+            This API requires the TempAuthentication token. If the token is valid, the new verification code will
+            be sent. If not, then 400 (bad request) with its message in body""")
     @PostMapping("/sign-up/resend")
-    public HttpEntity<?> verify(HttpServletRequest request) {
-        String confirmation = request.getHeader("TempAuthorization");
-        if (confirmation == null || !confirmation.startsWith("Confirmation")) {
-            return ResponseEntity.badRequest().build();
-        }
-        String token = confirmation.substring(13);
-        SignUpDto dto = jwtUtil.getDtoFromToken(token);
-        return ResponseEntity.ok(
-                jwtUtil.generateVerificationCodeToken(dto)
-        );
+    public HttpEntity<?> signUpResend(HttpServletRequest request) {
+        return jwtService.resendSignUpVerificationCode(request);
     }
 
+    @Operation(
+            summary = "Login page API",
+            description = """
+            This API receives user details, please check for validity before requesting this API. If user details are correct
+            two tokens will be send(refresh, access token). If not, then 400 error code with its message in body
+            """)
     @PostMapping("/login")
-    public TokenDto login(@RequestBody LoginDto loginDto) {
-        var auth = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginDto.email(), loginDto.password()));
-        return new TokenDto(
-                jwtUtil.genToken((UserDetails)auth.getPrincipal()),
-                jwtUtil.genRefreshToken((UserDetails)auth.getPrincipal()));
+    public HttpEntity<?> login(@RequestBody LoginDto loginDto) {
+        return jwtService.checkLoginDetails(loginDto);
     }
 
+    @Operation(
+            summary = "Forgot password page API",
+            description = """
+            Receives the email that user entered. Response will be TempAuthentication token. 400 error code with
+            its message in body""")
     @PostMapping("/login/forgot-password")
-    public HttpEntity<?> verify(@RequestBody String email) {
-        var user = userServiceImpl.findByEmail(email);
-        if (user.isEmpty()) {
-            return ResponseEntity.badRequest().build();
-        }
-        return ResponseEntity.ok(jwtUtil.generateCodeToken(email));
+    public HttpEntity<?> sendCode(@RequestBody String email) {
+        return jwtService.sendAccessCode(email);
     }
 
+    @Operation(
+            summary = "Code confirmation page API",
+            description = """
+             This API receives TempAuthentication and the code that user has typed. 400 error code with its message in body""")
     @PostMapping("/login/confirm")
-    public HttpEntity<?> register(@RequestBody String verificationCode, HttpServletRequest request) {
-        String confirmation = request.getHeader("TempAuthorization");
-        if (confirmation == null || !confirmation.startsWith("Confirmation")) {
-            return ResponseEntity.badRequest().build();
-        }
-        String token = confirmation.substring(13);
-        if (jwtUtil.checkVerification(verificationCode, token)) {
-            Optional<User> user = userServiceImpl.findByEmail(
-                    jwtUtil.getEmailFromToken(token));
-            return ResponseEntity.ok(new TokenDto(
-                    jwtUtil.genToken(user.get()),
-                    jwtUtil.genRefreshToken(user.get())
-            ));
-        }
-        return ResponseEntity.badRequest().build();
+    public HttpEntity<?> accountAccess(@RequestBody String verificationCode, HttpServletRequest request) {
+        return jwtService.checkVerificationCode(verificationCode, request);
     }
+
 
 }

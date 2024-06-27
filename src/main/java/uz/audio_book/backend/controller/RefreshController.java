@@ -1,5 +1,6 @@
 package uz.audio_book.backend.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,8 +11,9 @@ import uz.audio_book.backend.config.CustomUserDetailsService;
 import uz.audio_book.backend.config.JwtUtil;
 
 @RestController
-@RequestMapping("/api/refresh")
 @RequiredArgsConstructor
+@RequestMapping("/api/refresh")
+@Tag(name = "Token refresh API", description = "(Should receive refresh token and gives access token)")
 public class RefreshController {
 
     private final JwtUtil jwtUtil;

@@ -1,0 +1,96 @@
+package uz.audio_book.backend.service;
+
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
+import uz.audio_book.backend.config.JwtUtil;
+import uz.audio_book.backend.dto.LoginDto;
+import uz.audio_book.backend.dto.SignUpDto;
+import uz.audio_book.backend.dto.TokenDto;
+import uz.audio_book.backend.entity.User;
+
+import java.util.Optional;
+
+@RequiredArgsConstructor
+@Service
+public class JwtService {
+
+    private final JwtUtil jwtUtil;
+    private final UserService userService;
+    private final AuthenticationManager authenticationManager;
+
+    public HttpEntity<?> giveAccountDetailsToken(SignUpDto signUpDto) {
+        return ResponseEntity.ok(jwtUtil.generateVerificationCodeToken(signUpDto));
+    }
+
+    public ResponseEntity<?> signUpVerifyCode(String verificationCode, HttpServletRequest request) {
+        String confirmation = request.getHeader("TempAuthorization");
+        if (confirmation == null || !confirmation.startsWith("Confirmation")) {
+            return ResponseEntity.badRequest().body("Entered code is wrong! Please, try again!");
+        }
+        String token = confirmation.substring(13);
+        if (jwtUtil.checkVerificationCodeFromDto(verificationCode, token)) {
+            User user = userService.saveUserFromDto(jwtUtil.getDtoFromToken(token));
+            return ResponseEntity.ok(new TokenDto(
+                    jwtUtil.genToken(user),
+                    jwtUtil.genRefreshToken(user)));
+        } else {
+            return ResponseEntity.badRequest().body("Entered code is wrong! Please, try again!");
+        }
+    }
+
+    public ResponseEntity<?> resendSignUpVerificationCode(HttpServletRequest request) {
+        String confirmation = request.getHeader("TempAuthorization");
+        if (confirmation == null || !confirmation.startsWith("Confirmation")) {
+            return ResponseEntity.badRequest().body("Session is expired! Please, return to sign up page!");
+        }
+        String token = confirmation.substring(13);
+        SignUpDto dto = jwtUtil.getDtoFromToken(token);
+        return ResponseEntity.ok(
+                jwtUtil.generateVerificationCodeToken(dto)
+        );
+    }
+
+    public HttpEntity<?> checkLoginDetails(LoginDto loginDto) {
+       try {
+           var auth = authenticationManager.authenticate(
+                   new UsernamePasswordAuthenticationToken(loginDto.email(), loginDto.password()));
+           return ResponseEntity.ok(new TokenDto(
+                   jwtUtil.genToken((UserDetails) auth.getPrincipal()),
+                   jwtUtil.genRefreshToken((UserDetails) auth.getPrincipal())));
+       }catch (UsernameNotFoundException e) {
+           return ResponseEntity.badRequest().body("Email or password is incorrect!");
+       }
+    }
+
+    public ResponseEntity<?> sendAccessCode(String email) {
+        var user = userService.findByEmail(email);
+        if (user.isEmpty()) {
+            return ResponseEntity.badRequest().body("User doesn't exist!");
+        }
+        return ResponseEntity.ok(jwtUtil.generateCodeToken(email));
+    }
+
+    public ResponseEntity<?> checkVerificationCode(String verificationCode, HttpServletRequest request) {
+        String confirmation = request.getHeader("TempAuthorization");
+        if (confirmation != null && confirmation.startsWith("Confirmation")) {
+            String token = confirmation.substring(13);
+            if (jwtUtil.checkVerification(verificationCode, token)) {
+                Optional<User> user = userService.findByEmail(
+                        jwtUtil.getEmailFromToken(token));
+                return ResponseEntity.ok(new TokenDto(
+                        jwtUtil.genToken(user.get()),
+                        jwtUtil.genRefreshToken(user.get())
+                ));
+            }
+        }
+        return ResponseEntity.badRequest().body("Entered code is wrong! Please, try again!");
+    }
+
+}
