@@ -1,9 +1,20 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/audio_book
+    url: jdbc:postgresql://localhost:5432/postgres
     username: postgres
     password: root123
     driverClassName: org.postgresql.Driver
   jpa:
     hibernate:
       ddl-auto: update
+  mail:
+    host: smtp.mailtrap.io
+    port: 2525
+    username: 240988a18d1f79
+    password: 049160faae58ab
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true

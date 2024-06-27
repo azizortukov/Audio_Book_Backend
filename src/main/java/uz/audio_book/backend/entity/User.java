@@ -2,11 +2,11 @@ package uz.audio_book.backend.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Getter
 @Setter
@@ -15,7 +15,7 @@ import java.util.UUID;
 @Builder
 @Entity
 @Table(name = "users")
-public class User {
+public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", nullable = false)
@@ -31,6 +31,8 @@ public class User {
     private List<Category> personalCategories;
     @ManyToMany(fetch = FetchType.EAGER)
     private List<Book> myBooks;
+    @ManyToMany(fetch = FetchType.EAGER)
+    private List<Role> roles;
 
     @PrePersist
     protected void onCreate() {
@@ -42,4 +44,13 @@ public class User {
         }
     }
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return this.roles;
+    }
+
+    @Override
+    public String getUsername() {
+        return this.email;
+    }
 }
