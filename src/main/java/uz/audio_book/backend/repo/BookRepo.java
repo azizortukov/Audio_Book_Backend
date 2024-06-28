@@ -3,6 +3,7 @@ package uz.audio_book.backend.repo;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import uz.audio_book.backend.entity.Book;
+import uz.audio_book.backend.projection.AdminBookProjection;
 import uz.audio_book.backend.projection.BookProjection;
 
 import java.util.List;
@@ -86,7 +87,16 @@ public interface BookRepo extends JpaRepository<Book, UUID> {
                      JOIN comment c on b.id = c.book_id
             GROUP BY b.id, b.title, b.author
             ORDER BY RANDOM()
-            LIMIT 1
+            LIMIT 6
                         """, nativeQuery = true)
-    BookProjection findBestSeller();
+    List<BookProjection> findBestSeller();
+
+    @Query(nativeQuery = true, value = """
+        select b.id, b.title, b.author, b.description, array_agg(c.name) as categories,
+               b.created_at from book b
+        join public.book_categories bc on b.id = bc.book_id
+        join public.category c on c.id = bc.categories_id
+        group by b.id, b.created_at
+        order by b.created_at desc""")
+    List<AdminBookProjection> findAllAdminBookProjection();
 }

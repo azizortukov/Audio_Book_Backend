@@ -7,7 +7,7 @@ public interface BookProjection {
     UUID getId();
     String getTitle();
     String getAuthor();
-    int getRating();
+    Integer getRating();
     UUID[] getCategoryIds();
 
 }

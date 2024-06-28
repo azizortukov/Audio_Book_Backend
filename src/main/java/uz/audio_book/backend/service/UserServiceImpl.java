@@ -28,9 +28,9 @@ public class UserServiceImpl implements UserService {
         return userRepo.save(User.builder()
                 .email(dto.getEmail())
                 .password(passwordEncoder.encode(dto.getPassword()))
-                        .roles(new ArrayList<>(List.of(
-                                roleServiceImpl.findByName(RoleName.USER)
-                        )))
+                .roles(new ArrayList<>(List.of(
+                        roleServiceImpl.findByName(RoleName.ROLE_USER)
+                )))
                 .birthDate(LocalDate.parse(dto.getBirthDate(), formatter))
                 .build());
     }

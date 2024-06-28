@@ -1,6 +1,7 @@
 package uz.audio_book.backend.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -8,11 +9,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import uz.audio_book.backend.entity.Book;
 import uz.audio_book.backend.entity.Category;
 import uz.audio_book.backend.entity.User;
 import uz.audio_book.backend.projection.BookProjection;
 import uz.audio_book.backend.repo.BookRepo;
+import uz.audio_book.backend.repo.CategoryRepo;
 import uz.audio_book.backend.repo.UserRepo;
 
 import java.util.*;
@@ -20,9 +23,10 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class BookServiceImpl implements BookService {
-    private final AuthenticationManager authenticationManager;
+
     private final BookRepo bookRepo;
     private final UserRepo userRepo;
+    private final CategoryRepo categoryRepo;
 
     @Override
     public HttpEntity<?> getBooksProjection() {
@@ -38,7 +42,7 @@ public class BookServiceImpl implements BookService {
 
         List<BookProjection> newRelease =  bookRepo.findNewRelease();
         List<BookProjection> trendingNow = bookRepo.findTrendingNow();
-        BookProjection bestSeller = bookRepo.findBestSeller();
+        List<BookProjection> bestSeller = bookRepo.findBestSeller();
         List<BookProjection> recommended = new ArrayList<>();
         if (ids.isEmpty()) {
             recommended = bookRepo.findByPersonalCategories(ids);
@@ -55,6 +59,31 @@ public class BookServiceImpl implements BookService {
         return ResponseEntity.ok(result);
     }
 
+    @Override
+    public HttpEntity<?> getAdminProjection() {
+        return ResponseEntity.ok(bookRepo.findAllAdminBookProjection());
+    }
+
+    @SneakyThrows
+    @Override
+    public HttpEntity<?> saveBook(String title, String author, String description, List<UUID> categoryIds, MultipartFile photo, MultipartFile audio, MultipartFile pdf) {
+        List<Category> categories = categoryRepo.findAllById(categoryIds);
+        Book book = Book.builder()
+                .title(title)
+                .author(author)
+                .description(description)
+                .photo(photo.getBytes())
+                .pdf(pdf.getBytes())
+                .audio(audio.getBytes())
+                .categories(categories)
+                .build();
+        return ResponseEntity.ok(bookRepo.save(book));
+    }
+
+    @Override
+    public void deleteById(UUID bookId) {
+        bookRepo.deleteById(bookId);
+    }
 
     @Override
     public HttpEntity<byte[]> sendBookPicture(UUID bookId) {

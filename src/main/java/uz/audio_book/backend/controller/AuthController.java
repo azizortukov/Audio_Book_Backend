@@ -14,7 +14,6 @@ import uz.audio_book.backend.dto.LoginDTO;
 import uz.audio_book.backend.dto.SignUpDTO;
 import uz.audio_book.backend.service.JwtService;
 
-@PreAuthorize("hasRole('USER')")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/auth")
