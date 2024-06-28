@@ -1,5 +1,6 @@
 package uz.audio_book.backend.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.http.HttpEntity;
@@ -19,9 +20,29 @@ public class BookController {
 
     private final BookService bookService;
     private final BookRepo bookRepo;
+
+    @Operation(
+            summary = "Getting all books Page API",
+            description = """
+            This API returns books. The response will be: 200 (success), 
+            400 (bad request), 401 (un-authorized or not logged in)
+            or 403 (forbidden or token is expired) and response will be 
+            """)
     @GetMapping
     public HttpEntity<?> getBooks() {
         return bookService.getBooksProjection();
+    }
+
+    @Operation(
+            summary = "Getting home Page API",
+            description = """
+            This API returns books. The response will be: 200 (success), 
+            400 (bad request), 401 (un-authorized or not logged in)
+            or 403 (forbidden or token is expired) and response will be 
+            """)
+    @GetMapping("/home")
+    public HttpEntity<?> home() {
+        return bookService.getHomeData();
     }
 
     @GetMapping("/image/{bookId}")

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 public interface CategoryService {
 
 
+
     HttpEntity<?> getCategories();
 
 }

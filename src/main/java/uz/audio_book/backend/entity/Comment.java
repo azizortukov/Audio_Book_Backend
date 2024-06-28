@@ -15,10 +15,11 @@ import java.util.UUID;
 public class Comment {
     @Id
     @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
     private String body;
     @Column(nullable = false)
-    private Double rating;
+    private int rating;
     @JoinColumn(nullable = false)
     @ManyToOne
     private Book book;

@@ -11,4 +11,6 @@ public interface BookService {
     HttpEntity<?> getBooksProjection();
 
     HttpEntity<?> sendBookPicture(UUID bookId);
+
+    HttpEntity<?> getHomeData();
 }

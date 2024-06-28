@@ -19,5 +19,4 @@ public class CategoryController {
     public HttpEntity<?> getCategory() {
         return categoryService.getCategories();
     }
-
 }

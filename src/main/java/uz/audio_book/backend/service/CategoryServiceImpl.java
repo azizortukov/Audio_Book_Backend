@@ -2,6 +2,7 @@ package uz.audio_book.backend.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uz.audio_book.backend.repo.CategoryRepo;
 
@@ -13,8 +14,6 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public HttpEntity<?> getCategories() {
-        return new HttpEntity<>(categoryRepo.findAll());
+        return ResponseEntity.ok(categoryRepo.findAll());
     }
-
-
 }
