@@ -1,10 +1,11 @@
-package uz.audio_book.backend.config;
+package uz.audio_book.backend.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,16 +18,12 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
+@RequiredArgsConstructor
 public class JwtUtil {
 
     private final MailService mailService;
     private final ObjectMapper jacksonObjectMapper;
     Random random = new Random();
-
-    public JwtUtil(MailService mailService, ObjectMapper jacksonObjectMapper) {
-        this.mailService = mailService;
-        this.jacksonObjectMapper = jacksonObjectMapper;
-    }
 
     public String genToken(UserDetails userDetails) {
         String roles = userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.joining(","));
@@ -35,7 +32,6 @@ public class JwtUtil {
                 .claim("authorities", roles)
                 .issuedAt(new Date())
                 .issuer("audio.book")
-                // For testing this token duration can be changed
                 .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 30))
                 .signWith(genKey())
                 .compact();

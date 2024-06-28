@@ -1,4 +1,4 @@
-package uz.audio_book.backend.config;
+package uz.audio_book.backend.filter;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -11,6 +11,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import uz.audio_book.backend.util.JwtUtil;
 
 import java.io.IOException;
 import java.util.List;

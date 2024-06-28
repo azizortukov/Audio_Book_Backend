@@ -22,7 +22,7 @@ public interface BookRepo extends JpaRepository<Book, UUID> {
             FROM book b
                      JOIN book_categories bc ON b.id = bc.book_id
             GROUP BY b.id, b.title, b.author;
-                                    """, nativeQuery = true)
+            """, nativeQuery = true)
     List<BookProjection> findAllProjections();
 
     @Query(value = """
@@ -38,7 +38,7 @@ public interface BookRepo extends JpaRepository<Book, UUID> {
                      WHERE bc.categories_id IN (:categoriesIds)
             GROUP BY b.id, b.title, b.author
             LIMIT 6
-                                    """, nativeQuery = true)
+            """, nativeQuery = true)
     List<BookProjection> findByPersonalCategories(List<UUID> categoriesIds);
 
     @Query(value = """
@@ -52,7 +52,7 @@ public interface BookRepo extends JpaRepository<Book, UUID> {
             FROM book b
                      JOIN book_categories bc ON b.id = bc.book_id
             GROUP BY b.id, b.title, b.author
-            ORDER BY b.created_at DESC 
+            ORDER BY b.created_at DESC
             LIMIT 6
             """, nativeQuery = true)
     List<BookProjection> findNewRelease();
@@ -71,7 +71,7 @@ public interface BookRepo extends JpaRepository<Book, UUID> {
             GROUP BY b.id, b.title, b.author
             ORDER BY count(c.*) DESC
             LIMIT 6
-                        """, nativeQuery = true)
+            """, nativeQuery = true)
     List<BookProjection> findTrendingNow();
 
     @Query(value = """
@@ -88,15 +88,16 @@ public interface BookRepo extends JpaRepository<Book, UUID> {
             GROUP BY b.id, b.title, b.author
             ORDER BY RANDOM()
             LIMIT 6
-                        """, nativeQuery = true)
+            """, nativeQuery = true)
     List<BookProjection> findBestSeller();
 
-    @Query(nativeQuery = true, value = """
-        select b.id, b.title, b.author, b.description, array_agg(c.name) as categories,
-               b.created_at from book b
-        join public.book_categories bc on b.id = bc.book_id
-        join public.category c on c.id = bc.categories_id
-        group by b.id, b.created_at
-        order by b.created_at desc""")
+    @Query(value = """
+            SELECT b.id, b.title, b.author, b.description, ARRAY_AGG(c.name) AS categories,
+                   b.created_at FROM book b
+            JOIN public.book_categories bc ON b.id = bc.book_id
+            JOIN public.category c ON c.id = bc.categories_id
+            GROUP BY b.id, b.created_at
+            ORDER BY b.created_at DESC
+            """, nativeQuery = true)
     List<AdminBookProjection> findAllAdminBookProjection();
 }

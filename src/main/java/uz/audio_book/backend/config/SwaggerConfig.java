@@ -13,7 +13,6 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class SwaggerConfig {
 
-
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
@@ -23,13 +22,12 @@ public class SwaggerConfig {
                         .contact(new Contact()
                                 .name("Aziz Ortukov")
                                 .email("azizortukov818@gmail.com")
-                                .url("azizortukov.uz"))
+                                .url("https://t.me/anas_ortukov"))
                         .description("Documentation of Audio Book REST API")
                         .termsOfService("http://swagger.io/terms/")
                         .license(new License()
                                 .name("Apache 2.0")
-                                .url("http://springdoc.org"))
-                )
+                                .url("http://springdoc.org")))
                 .addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
                 .components(new Components()
                         .addSecuritySchemes("bearerAuth", new SecurityScheme()
@@ -38,5 +36,4 @@ public class SwaggerConfig {
                                 .scheme("bearer")
                                 .bearerFormat("JWT")));
     }
-
 }

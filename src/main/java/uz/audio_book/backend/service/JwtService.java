@@ -6,14 +6,15 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import uz.audio_book.backend.config.JwtUtil;
+import uz.audio_book.backend.util.JwtUtil;
 import uz.audio_book.backend.dto.LoginDTO;
 import uz.audio_book.backend.dto.SignUpDTO;
 import uz.audio_book.backend.dto.TokenDTO;
 import uz.audio_book.backend.entity.User;
+import uz.audio_book.backend.util.DateUtil;
 
 import java.util.Optional;
 
@@ -26,6 +27,9 @@ public class JwtService {
     private final AuthenticationManager authenticationManager;
 
     public HttpEntity<?> giveAccountDetailsToken(SignUpDTO signUpDto) {
+        if (!DateUtil.isValidFormat(signUpDto.getBirthDate())) {
+            return ResponseEntity.badRequest().body("Birth date is incorrect");
+        }
         return ResponseEntity.ok(jwtUtil.generateVerificationCodeToken(signUpDto));
     }
 
@@ -64,7 +68,8 @@ public class JwtService {
            return ResponseEntity.ok(new TokenDTO(
                    jwtUtil.genToken((UserDetails) auth.getPrincipal()),
                    jwtUtil.genRefreshToken((UserDetails) auth.getPrincipal())));
-       }catch (UsernameNotFoundException e) {
+       }catch (AuthenticationException e) {
+           System.out.println("coming");
            return ResponseEntity.badRequest().body("Email or password is incorrect!");
        }
     }

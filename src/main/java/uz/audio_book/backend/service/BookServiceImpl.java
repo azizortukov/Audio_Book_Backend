@@ -6,7 +6,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -86,28 +85,52 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public HttpEntity<byte[]> sendBookPicture(UUID bookId) {
+    public HttpEntity<?> sendBookPicture(UUID bookId) {
         Optional<Book> bookById = bookRepo.findById(bookId);
         if (bookById.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
         Book book = bookById.get();
         HttpHeaders headers = new HttpHeaders();
-//        Response type for image
-//        headers.setContentType(MediaType.IMAGE_JPEG);
-//        Response type for pdf
-//        headers.setContentType(MediaType.APPLICATION_PDF);
-        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-        headers.setContentDispositionFormData("attachment", "sample.mp3");
+        headers.setContentType(MediaType.IMAGE_JPEG);
         headers.setContentLength(book.getPhoto().length);
 
         return ResponseEntity.ok()
                 .headers(headers)
-//                Response type for image
-//                .contentType(MediaType.IMAGE_JPEG
-//                 Response type for pdf
-//                .contentType(MediaType.APPLICATION_PDF)
-                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .contentType(MediaType.IMAGE_JPEG)
                 .body(book.getPhoto());
+    }
+
+    @Override
+    public HttpEntity<?> sendBookPDF(UUID bookId) {
+        Optional<Book> bookById = bookRepo.findById(bookId);
+        if (bookById.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        Book book = bookById.get();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentLength(book.getPdf().length);
+        return ResponseEntity.ok()
+                .headers(headers)
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(book.getPdf());
+    }
+
+    @Override
+    public HttpEntity<?> sendBookAudio(UUID bookId) {
+        Optional<Book> bookById = bookRepo.findById(bookId);
+        if (bookById.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        Book book = bookById.get();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        headers.setContentDispositionFormData("attachment", book.getTitle() + ".mp3");
+        headers.setContentLength(book.getAudio().length);
+        return ResponseEntity.ok()
+                .headers(headers)
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(book.getAudio());
     }
 }

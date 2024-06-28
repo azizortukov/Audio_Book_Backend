@@ -1,5 +1,6 @@
 package uz.audio_book.backend.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -11,10 +12,11 @@ import uz.audio_book.backend.service.CategoryService;
 import java.util.List;
 import java.util.UUID;
 
-@PreAuthorize("hasRole('ADMIN')")
 @RestController
 @RequestMapping("/api/admin")
 @RequiredArgsConstructor
+@PreAuthorize("hasRole('ADMIN')")
+@Tag(name = "Admin API", description = "(Only for frontend! Cannot be used for flutter Development)")
 public class AdminController {
 
     private final BookService bookService;
