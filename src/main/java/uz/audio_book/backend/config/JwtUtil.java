@@ -9,7 +9,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-import uz.audio_book.backend.dto.SignUpDto;
+import uz.audio_book.backend.dto.SignUpDTO;
 import uz.audio_book.backend.service.MailService;
 
 import javax.crypto.SecretKey;
@@ -84,7 +84,7 @@ public class JwtUtil {
         return Arrays.stream(authorities.split(",")).map(SimpleGrantedAuthority::new).collect(Collectors.toList());
     }
 
-    public String generateVerificationCodeToken(SignUpDto user) {
+    public String generateVerificationCodeToken(SignUpDTO user) {
         user.setVerificationCode(genVerificationCode().toString());
         Map<String, Object> claims = new HashMap<>();
         claims.put("email", user.getEmail());
@@ -113,14 +113,14 @@ public class JwtUtil {
     }
 
     public boolean checkVerificationCodeFromDto(String verificationCode, String token) {
-        SignUpDto user = getDtoFromToken(token);
+        SignUpDTO user = getDtoFromToken(token);
         return verificationCode.equals(user.getVerificationCode());
     }
 
-    public SignUpDto getDtoFromToken(String token) {
+    public SignUpDTO getDtoFromToken(String token) {
         Claims claims = getClaims(token);
         Map<String, Object> details = claims.get("details", Map.class);
-        return jacksonObjectMapper.convertValue(details, SignUpDto.class);
+        return jacksonObjectMapper.convertValue(details, SignUpDTO.class);
     }
 
     public String generateCodeToken(String email) {

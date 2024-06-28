@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import uz.audio_book.backend.dto.LoginDto;
-import uz.audio_book.backend.dto.SignUpDto;
+import uz.audio_book.backend.dto.LoginDTO;
+import uz.audio_book.backend.dto.SignUpDTO;
 import uz.audio_book.backend.service.JwtService;
 
 @PreAuthorize("hasRole('USER')")
@@ -31,7 +31,7 @@ public class AuthController {
             get token from you in other page in that name. Please check email and password for format before
             requesting this API""")
     @PostMapping("/sign-up")
-    public HttpEntity<?> signUp(@RequestBody SignUpDto signUpDto) {
+    public HttpEntity<?> signUp(@RequestBody SignUpDTO signUpDto) {
         return jwtService.giveAccountDetailsToken(signUpDto);
     }
 
@@ -63,7 +63,7 @@ public class AuthController {
             two tokens will be send(refresh, access token). If not, then 400 error code with its message in body
             """)
     @PostMapping("/login")
-    public HttpEntity<?> login(@RequestBody LoginDto loginDto) {
+    public HttpEntity<?> login(@RequestBody LoginDTO loginDto) {
         return jwtService.checkLoginDetails(loginDto);
     }
 

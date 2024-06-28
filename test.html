@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Upload</title>
+</head>
+<body>
+<h2>Upload Image</h2>
+<form id="uploadForm" enctype="multipart/form-data">
+  <input type="file" name="file" id="fileInput">
+  <br><br>
+  <button type="button" onclick="uploadImage()">Upload Image</button>
+</form>
+
+<div id="response"></div>
+
+<script>
+  function uploadImage() {
+    var form = document.getElementById("uploadForm");
+    var formData = new FormData(form);
+
+    fetch('http://localhost:8080/api/book/upload', {
+      method: 'POST',
+      body: formData
+    })
+            .then(response => response.json())
+            .then(data => {
+              document.getElementById("response").innerHTML = "<p>Upload successful!</p><img src='" + data.imageUrl + "' width='300'>";
+            })
+            .catch(error => {
+              console.error('Error:', error);
+              document.getElementById("response").innerHTML = "<p>Upload failed!</p>";
+            });
+  }
+</script>
+</body>
+</html>

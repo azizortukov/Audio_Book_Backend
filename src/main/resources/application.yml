@@ -1,6 +1,7 @@
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/audio_book
+#    url: jdbc:postgresql://postgres-db:5432/postgres
     username: postgres
     password: root123
     driverClassName: org.postgresql.Driver
@@ -18,3 +19,6 @@ spring:
           auth: true
           starttls:
             enable: true
+  servlet:
+    multipart:
+      max-file-size: 20MB

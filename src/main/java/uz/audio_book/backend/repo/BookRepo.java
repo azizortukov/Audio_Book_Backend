@@ -6,4 +6,6 @@ import uz.audio_book.backend.entity.Book;
 import java.util.UUID;
 
 public interface BookRepo extends JpaRepository<Book, UUID> {
+
+//    List<BookProjection> findAllProjections();
 }

@@ -3,7 +3,7 @@ package uz.audio_book.backend.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import uz.audio_book.backend.dto.SignUpDto;
+import uz.audio_book.backend.dto.SignUpDTO;
 import uz.audio_book.backend.entity.User;
 import uz.audio_book.backend.entity.enums.RoleName;
 import uz.audio_book.backend.repo.UserRepo;
@@ -23,7 +23,7 @@ public class UserServiceImpl implements UserService {
     private final RoleServiceImpl roleServiceImpl;
 
     @Override
-    public User saveUserFromDto(SignUpDto dto) {
+    public User saveUserFromDto(SignUpDTO dto) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         return userRepo.save(User.builder()
                 .email(dto.getEmail())

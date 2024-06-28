@@ -10,9 +10,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import uz.audio_book.backend.config.JwtUtil;
-import uz.audio_book.backend.dto.LoginDto;
-import uz.audio_book.backend.dto.SignUpDto;
-import uz.audio_book.backend.dto.TokenDto;
+import uz.audio_book.backend.dto.LoginDTO;
+import uz.audio_book.backend.dto.SignUpDTO;
+import uz.audio_book.backend.dto.TokenDTO;
 import uz.audio_book.backend.entity.User;
 
 import java.util.Optional;
@@ -25,7 +25,7 @@ public class JwtService {
     private final UserService userService;
     private final AuthenticationManager authenticationManager;
 
-    public HttpEntity<?> giveAccountDetailsToken(SignUpDto signUpDto) {
+    public HttpEntity<?> giveAccountDetailsToken(SignUpDTO signUpDto) {
         return ResponseEntity.ok(jwtUtil.generateVerificationCodeToken(signUpDto));
     }
 
@@ -37,7 +37,7 @@ public class JwtService {
         String token = confirmation.substring(13);
         if (jwtUtil.checkVerificationCodeFromDto(verificationCode, token)) {
             User user = userService.saveUserFromDto(jwtUtil.getDtoFromToken(token));
-            return ResponseEntity.ok(new TokenDto(
+            return ResponseEntity.ok(new TokenDTO(
                     jwtUtil.genToken(user),
                     jwtUtil.genRefreshToken(user)));
         } else {
@@ -51,17 +51,17 @@ public class JwtService {
             return ResponseEntity.badRequest().body("Session is expired! Please, return to sign up page!");
         }
         String token = confirmation.substring(13);
-        SignUpDto dto = jwtUtil.getDtoFromToken(token);
+        SignUpDTO dto = jwtUtil.getDtoFromToken(token);
         return ResponseEntity.ok(
                 jwtUtil.generateVerificationCodeToken(dto)
         );
     }
 
-    public HttpEntity<?> checkLoginDetails(LoginDto loginDto) {
+    public HttpEntity<?> checkLoginDetails(LoginDTO loginDto) {
        try {
            var auth = authenticationManager.authenticate(
                    new UsernamePasswordAuthenticationToken(loginDto.email(), loginDto.password()));
-           return ResponseEntity.ok(new TokenDto(
+           return ResponseEntity.ok(new TokenDTO(
                    jwtUtil.genToken((UserDetails) auth.getPrincipal()),
                    jwtUtil.genRefreshToken((UserDetails) auth.getPrincipal())));
        }catch (UsernameNotFoundException e) {
@@ -84,7 +84,7 @@ public class JwtService {
             if (jwtUtil.checkVerification(verificationCode, token)) {
                 Optional<User> user = userService.findByEmail(
                         jwtUtil.getEmailFromToken(token));
-                return ResponseEntity.ok(new TokenDto(
+                return ResponseEntity.ok(new TokenDTO(
                         jwtUtil.genToken(user.get()),
                         jwtUtil.genRefreshToken(user.get())
                 ));
