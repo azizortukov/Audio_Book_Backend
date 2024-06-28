@@ -27,7 +27,7 @@ public class AuthController {
             summary = "Sign up page API",
             description = """
             This API receives user details json and verification code is not needed. This API always sends
-            token, because its new user. Please save that token as 'TempAuthentication' because security will
+            token, because its new user. Please save that token as 'TempAuthorization' because security will
             get token from you in other page in that name. Please check email and password for format before
             requesting this API""")
     @PostMapping("/sign-up")
@@ -38,7 +38,7 @@ public class AuthController {
     @Operation(
             summary = "Code verification page API",
             description = """
-            This API requires TempAuthentication token, then the code that user has typed. The response will
+            This API requires TempAuthorization token, then the code that user has typed. The response will
             be either 200 with two tokens which are access token and refresh token or 400 (bad request) with
             its message in body""")
     @PostMapping("/sign-up/verify")
@@ -49,7 +49,7 @@ public class AuthController {
     @Operation(
             summary = "Code verification page API",
             description = """
-            This API requires the TempAuthentication token. If the token is valid, the new verification code will
+            This API requires the TempAuthorization token. If the token is valid, the new verification code will
             be sent. If not, then 400 (bad request) with its message in body""")
     @PostMapping("/sign-up/resend")
     public HttpEntity<?> signUpResend(HttpServletRequest request) {
@@ -70,7 +70,7 @@ public class AuthController {
     @Operation(
             summary = "Forgot password page API",
             description = """
-            Receives the email that user entered. Response will be TempAuthentication token. 400 error code with
+            Receives the email that user entered. Response will be TempAuthorization token. 400 error code with
             its message in body""")
     @PostMapping("/login/forgot-password")
     public HttpEntity<?> sendCode(@RequestBody String email) {
@@ -80,7 +80,7 @@ public class AuthController {
     @Operation(
             summary = "Code confirmation page API",
             description = """
-             This API receives TempAuthentication and the code that user has typed. 400 error code with its message in body""")
+             This API receives TempAuthorization and the code that user has typed. 400 error code with its message in body""")
     @PostMapping("/login/confirm")
     public HttpEntity<?> accountAccess(@RequestBody String verificationCode, HttpServletRequest request) {
         return jwtService.checkVerificationCode(verificationCode, request);
