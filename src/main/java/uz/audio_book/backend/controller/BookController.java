@@ -7,6 +7,8 @@ import org.springframework.http.HttpEntity;
 import org.springframework.web.bind.annotation.*;
 import uz.audio_book.backend.service.BookService;
 
+import java.util.UUID;
+
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/book")
@@ -18,9 +20,9 @@ public class BookController {
     @Operation(
             summary = "Getting all books Page API",
             description = """
-            This API returns books. The response will be: 200 (success),
-            400 (bad request), 401 (un-authorized or not logged in)
-            or 403 (forbidden or token is expired)""")
+                    This API returns books. The response will be: 200 (success),
+                    400 (bad request), 401 (un-authorized or not logged in)
+                    or 403 (forbidden or token is expired)""")
     @GetMapping
     public HttpEntity<?> getBooks() {
         return bookService.getBooksProjection();
@@ -29,10 +31,10 @@ public class BookController {
     @Operation(
             summary = "Getting home Page API",
             description = """
-            This API returns books for Home page of User. The response will be: 200 (success),
-            400 (bad request), 401 (un-authorized or not logged in)
-            or 403 (forbidden or token is expired) and response will be
-            """)
+                    This API returns books for Home page of User. The response will be: 200 (success),
+                    400 (bad request), 401 (un-authorized or not logged in)
+                    or 403 (forbidden or token is expired) and response will be
+                    """)
     @GetMapping("/home")
     public HttpEntity<?> home() {
         return bookService.getHomeData();
@@ -41,13 +43,24 @@ public class BookController {
     @Operation(
             summary = "Searching books API",
             description = """
-            This API returns books for searched result that matches with author
-            name or book title. The response will be: 200 (success), 400 (bad request),
-            401 (un-authorized or not logged in) or 403 (forbidden or token is expired).
-            """)
+                    This API returns books for searched result that matches with author
+                    name or book title. The response will be: 200 (success), 400 (bad request),
+                    401 (un-authorized or not logged in) or 403 (forbidden or token is expired).
+                    """)
     @GetMapping("/search/{search}")
-    public HttpEntity<?> search(@PathVariable String search){
+    public HttpEntity<?> search(@PathVariable String search) {
         return bookService.getByAuthorOrTitle(search);
+    }
+
+    @Operation(
+            summary = "Getting single book details with comments",
+            description = """
+                    This API returns selected book details with comments. The response will be: 200 (success), 
+                    400 (bad request), 401 (un-authorized or not logged in) or 403 (forbidden or token is expired).
+                    """)
+    @GetMapping("{id}")
+    public HttpEntity<?> getSelected(@PathVariable UUID id) {
+        return bookService.getSelected(id);
     }
 
 
