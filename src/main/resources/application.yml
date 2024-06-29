@@ -7,7 +7,7 @@ spring:
     driverClassName: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
   mail:
     host: smtp.mailtrap.io
     port: 2525

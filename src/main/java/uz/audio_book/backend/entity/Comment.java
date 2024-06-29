@@ -2,7 +2,9 @@ package uz.audio_book.backend.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Getter
@@ -26,5 +28,7 @@ public class Comment {
     @JoinColumn(nullable = false)
     @ManyToOne
     private User user;
+    @CreationTimestamp
+    private LocalDate localDate;
 
 }

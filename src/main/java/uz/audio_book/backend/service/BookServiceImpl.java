@@ -13,8 +13,11 @@ import uz.audio_book.backend.entity.Book;
 import uz.audio_book.backend.entity.Category;
 import uz.audio_book.backend.entity.User;
 import uz.audio_book.backend.projection.BookProjection;
+import uz.audio_book.backend.projection.CommentProjection;
+import uz.audio_book.backend.projection.SelectedBookProjection;
 import uz.audio_book.backend.repo.BookRepo;
 import uz.audio_book.backend.repo.CategoryRepo;
+import uz.audio_book.backend.repo.CommentRepo;
 import uz.audio_book.backend.repo.UserRepo;
 
 import java.util.*;
@@ -26,6 +29,7 @@ public class BookServiceImpl implements BookService {
     private final BookRepo bookRepo;
     private final UserRepo userRepo;
     private final CategoryRepo categoryRepo;
+    private final CommentRepo commentRepo;
 
     @Override
     public HttpEntity<?> getBooksProjection() {
@@ -42,7 +46,7 @@ public class BookServiceImpl implements BookService {
         List<BookProjection> newRelease =  bookRepo.findNewRelease();
         List<BookProjection> trendingNow = bookRepo.findTrendingNow();
         List<BookProjection> bestSeller = bookRepo.findBestSeller();
-        List<BookProjection> recommended = new ArrayList<>();
+        List<BookProjection> recommended;
         if (ids.isEmpty()) {
             recommended = bookRepo.findByPersonalCategories(ids);
         } else {
@@ -137,5 +141,16 @@ public class BookServiceImpl implements BookService {
         String searchBy = "%" + search + "%";
         List<BookProjection> searchedBooks = bookRepo.findAllByAuthorOrTitle(searchBy);
         return ResponseEntity.ok(searchedBooks);
+    }
+
+    @Override
+    public HttpEntity<?> getSelected(UUID id) {
+        SelectedBookProjection selectedBook = bookRepo.findSelectedBookByDetails(id);
+        List<CommentProjection> bookComments = commentRepo.findByBookId(id);
+        List<Object> result = List.of(
+                selectedBook,
+                bookComments
+        );
+        return ResponseEntity.ok(result);
     }
 }

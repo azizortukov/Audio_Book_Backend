@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import uz.audio_book.backend.entity.Book;
 import uz.audio_book.backend.projection.AdminBookProjection;
 import uz.audio_book.backend.projection.BookProjection;
+import uz.audio_book.backend.projection.SelectedBookProjection;
 
 import java.util.List;
 import java.util.UUID;
@@ -116,4 +117,22 @@ public interface BookRepo extends JpaRepository<Book, UUID> {
             GROUP BY b.id, b.title, b.author
                         """, nativeQuery = true)
     List<BookProjection> findAllByAuthorOrTitle(String searchBy);
+
+    @Query(value = """
+            SELECT b.id,
+                  b.title,
+                  b.author,
+                  ARRAY_AGG(DISTINCT ct.name) AS categoryNames,
+                  ROUND((SELECT SUM(c.rating) * 1.0 / COUNT(*)
+                         FROM comment c
+                         WHERE c.book_id = b.id), 2) AS rating,
+                  b.description
+           FROM book b
+                    JOIN book_categories bc ON b.id = bc.book_id
+                    JOIN comment c on b.id = c.book_id
+                    JOIN category ct on bc.categories_id = ct.id
+           WHERE b.id =:id
+           GROUP BY b.id, b.title, b.author
+                        """, nativeQuery = true)
+    SelectedBookProjection findSelectedBookByDetails(UUID id);
 }
