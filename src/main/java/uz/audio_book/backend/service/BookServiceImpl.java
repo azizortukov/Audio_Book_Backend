@@ -12,10 +12,11 @@ import uz.audio_book.backend.entity.Book;
 import uz.audio_book.backend.entity.Category;
 import uz.audio_book.backend.entity.User;
 import uz.audio_book.backend.projection.BookProjection;
+import uz.audio_book.backend.projection.CommentProjection;
+import uz.audio_book.backend.projection.SelectedBookProjection;
 import uz.audio_book.backend.repo.BookRepo;
 import uz.audio_book.backend.repo.CategoryRepo;
-import uz.audio_book.backend.repo.UserRepo;
-
+import uz.audio_book.backend.repo.CommentRepo;
 import java.util.*;
 
 @Service
@@ -23,9 +24,9 @@ import java.util.*;
 public class BookServiceImpl implements BookService {
 
     private final BookRepo bookRepo;
-    private final UserRepo userRepo;
     private final CategoryRepo categoryRepo;
     private final UserService userService;
+    private final CommentRepo commentRepo;
 
     @Override
     public HttpEntity<?> getBooksProjection() {
@@ -137,4 +138,15 @@ public class BookServiceImpl implements BookService {
         List<BookProjection> searchedBooks = bookRepo.findAllByAuthorOrTitle(searchBy);
         return ResponseEntity.ok(searchedBooks);
     }
+
+    public HttpEntity<?> getSelected(UUID id) {
+        SelectedBookProjection selectedBook = bookRepo.findSelectedBookByDetails(id);
+        List<CommentProjection> bookComments = commentRepo.findByBookId(id);
+        List<Object> result = List.of(
+                selectedBook,
+                bookComments
+        );
+        return ResponseEntity.ok(result);
+    }
+
 }
