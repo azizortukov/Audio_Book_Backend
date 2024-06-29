@@ -5,11 +5,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import uz.audio_book.backend.service.BookService;
+import uz.audio_book.backend.service.UserService;
 
 import java.util.UUID;
 
@@ -21,6 +20,7 @@ import java.util.UUID;
 public class FileController {
 
     private final BookService bookService;
+    private final UserService userService;
 
     @Operation(
             summary = "Image API",
@@ -54,6 +54,28 @@ public class FileController {
     @GetMapping("/audio/{bookId}")
     public HttpEntity<?> getAudio(@PathVariable UUID bookId) {
         return bookService.sendBookAudio(bookId);
+    }
+
+    @Operation(
+            summary = "Profile photo API",
+            description = """
+                    This API sends profile photo of logged in user. Response will be either 200
+                    (good status) with profile photo, 403 (unauthorized user) and 404 (user not found)
+                    or 204 (no content) meaning user doesn't have profile image.""")
+    @GetMapping("/user")
+    public HttpEntity<?> getImage() {
+        return userService.getUserPhoto();
+    }
+
+    @Operation(
+            summary = "Update profile photo API",
+            description = """
+                    This API receives image named as file in form-data. Image will be uploaded for whom
+                    logged in. Response will be either 200 (good status), 403 (unauthorized user) or
+                    404 (user not found)""")
+    @PostMapping("/user/upload")
+    public HttpEntity<?> uploadImage(@RequestParam("file") MultipartFile file) {
+        return userService.updateUserPhoto(file);
     }
 
 }

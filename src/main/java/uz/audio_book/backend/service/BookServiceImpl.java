@@ -6,7 +6,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import uz.audio_book.backend.entity.Book;
@@ -26,6 +25,7 @@ public class BookServiceImpl implements BookService {
     private final BookRepo bookRepo;
     private final UserRepo userRepo;
     private final CategoryRepo categoryRepo;
+    private final UserService userService;
 
     @Override
     public HttpEntity<?> getBooksProjection() {
@@ -35,8 +35,7 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public HttpEntity<?> getHomeData() {
-        String email = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
-        User user = userRepo.findByEmail(email).get();
+        User user = userService.getUserFromContextHolder().get();
         List<UUID> ids = user.getPersonalCategories().stream().map(Category::getId).toList();
 
         List<BookProjection> newRelease =  bookRepo.findNewRelease();
