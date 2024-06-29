@@ -17,7 +17,7 @@ import uz.audio_book.backend.service.JwtService;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/auth")
-@Tag(name = "Authentication API", description = "(For Sign Up, Login, sending code and getting refresh & access token)")
+@Tag(name = "Authentication API", description = "(For Sign Up, Login, sending verification code")
 public class AuthController {
 
     private final JwtService jwtService;

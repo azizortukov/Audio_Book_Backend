@@ -50,9 +50,11 @@ public class Runner implements CommandLineRunner {
             }
             List<User> users = List.of(
                     userRepo.save(User.builder()
-                            .roles(roles)
-                            .email("qwe")
-                            .password(passwordEncoder.encode("qwe"))
+                            .roles(List.of(
+                                    roleRepo.findByRoleName(RoleName.ROLE_USER)
+                            ))
+                            .email("eshmat")
+                            .password(passwordEncoder.encode("123"))
                             .personalCategories(List.of(
                                     categories.get(0),
                                     categories.get(1),
@@ -60,9 +62,11 @@ public class Runner implements CommandLineRunner {
                             ))
                             .build()),
                     userRepo.save(User.builder()
-                            .roles(roles)
-                            .email("asd")
-                            .password(passwordEncoder.encode("asd"))
+                            .roles(List.of(
+                                    roleRepo.findByRoleName(RoleName.ROLE_ADMIN)
+                            ))
+                            .email("toshmat")
+                            .password(passwordEncoder.encode("123"))
                             .personalCategories(List.of(
                                     categories.get(3),
                                     categories.get(4),

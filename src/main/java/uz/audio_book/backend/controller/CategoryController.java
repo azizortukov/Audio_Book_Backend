@@ -47,4 +47,13 @@ public class CategoryController {
     public HttpEntity<?> customizeCategories() {
         return categoryService.customizeAllCategories();
     }
+
+    @Operation(
+            summary = "Categories Recommended categories",
+            description = """
+            This API returns recommended categories to current user""")
+    @GetMapping("recommended")
+    public HttpEntity<?> getRecommended(){
+        return categoryService.getRecommendedCategories();
+    }
 }

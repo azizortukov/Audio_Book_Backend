@@ -14,4 +14,6 @@ public interface CategoryService {
     HttpEntity<?> customizeCategoryByIds(List<UUID> categoryIds);
 
     HttpEntity<?> customizeAllCategories();
+
+    HttpEntity<?> getRecommendedCategories();
 }

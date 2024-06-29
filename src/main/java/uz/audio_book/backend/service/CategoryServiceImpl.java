@@ -10,9 +10,7 @@ import uz.audio_book.backend.entity.User;
 import uz.audio_book.backend.repo.CategoryRepo;
 import uz.audio_book.backend.repo.UserRepo;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -54,6 +52,17 @@ public class CategoryServiceImpl implements CategoryService {
             user.get().getPersonalCategories().addAll(categoryRepo.findAll());
             userRepo.save(user.get());
             return ResponseEntity.ok("Saved successfully");
+        } else {
+            return ResponseEntity.badRequest().body("User not found");
+        }
+    }
+
+    @Override
+    public HttpEntity<?> getRecommendedCategories() {
+        String userEmail = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
+        Optional<User> user = userRepo.findByEmail(userEmail);
+        if (user.isPresent()) {
+            return ResponseEntity.ok().body(user.get().getPersonalCategories());
         } else {
             return ResponseEntity.badRequest().body("User not found");
         }

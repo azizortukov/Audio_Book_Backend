@@ -48,13 +48,11 @@ public class BookServiceImpl implements BookService {
         } else {
             recommended = trendingNow;
         }
-        Map<String, Object> result = Map.of(
-                "new-release", newRelease,
-                "trending-now", trendingNow,
-                "best-seller", bestSeller,
-                "recommended", recommended
-        );
-
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("recommended", recommended);
+        result.put("best-seller", bestSeller);
+        result.put("new-release", newRelease);
+        result.put("trending-now", trendingNow);
         return ResponseEntity.ok(result);
     }
 
@@ -132,5 +130,12 @@ public class BookServiceImpl implements BookService {
                 .headers(headers)
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(book.getAudio());
+    }
+
+    @Override
+    public HttpEntity<?> getByAuthorOrTitle(String search) {
+        String searchBy = "%" + search + "%";
+        List<BookProjection> searchedBooks = bookRepo.findAllByAuthorOrTitle(searchBy);
+        return ResponseEntity.ok(searchedBooks);
     }
 }

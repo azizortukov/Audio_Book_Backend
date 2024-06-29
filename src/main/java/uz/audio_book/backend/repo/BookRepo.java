@@ -100,4 +100,20 @@ public interface BookRepo extends JpaRepository<Book, UUID> {
             ORDER BY b.created_at DESC
             """, nativeQuery = true)
     List<AdminBookProjection> findAllAdminBookProjection();
+
+    @Query(value = """
+           SELECT b.id,
+                   b.title,
+                   b.author,
+                   ARRAY_AGG(DISTINCT bc.categories_id) AS categoryIds,
+                   ROUND((SELECT SUM(c.rating) * 1.0 / COUNT(*)
+                          FROM comment c
+                          WHERE c.book_id = b.id), 2) AS rating
+            FROM book b
+                     JOIN book_categories bc ON b.id = bc.book_id
+                     JOIN comment c on b.id = c.book_id
+            WHERE b.title ILIKE :searchBy OR b.author ILIKE :searchBy
+            GROUP BY b.id, b.title, b.author
+                        """, nativeQuery = true)
+    List<BookProjection> findAllByAuthorOrTitle(String searchBy);
 }

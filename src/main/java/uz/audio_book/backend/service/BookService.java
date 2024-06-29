@@ -25,4 +25,6 @@ public interface BookService {
     HttpEntity<?> sendBookPDF(UUID bookId);
 
     HttpEntity<?> sendBookAudio(UUID bookId);
+
+    HttpEntity<?> getByAuthorOrTitle(String search);
 }
