@@ -1,4 +1,4 @@
 package uz.audio_book.backend.dto;
 
-public record TokenDTO(String token, String refreshToken) {
+public record TokenDTO(String accessToken, String refreshToken) {
 }
