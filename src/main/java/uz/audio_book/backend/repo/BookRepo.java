@@ -52,7 +52,7 @@ public interface BookRepo extends JpaRepository<Book, UUID> {
                           WHERE c.book_id = b.id), 2) AS rating
             FROM book b
                      JOIN book_categories bc ON b.id = bc.book_id
-            GROUP BY b.id, b.title, b.author
+            GROUP BY b.id, b.title, b.author, b.created_at
             ORDER BY b.created_at DESC
             LIMIT 6
             """, nativeQuery = true)

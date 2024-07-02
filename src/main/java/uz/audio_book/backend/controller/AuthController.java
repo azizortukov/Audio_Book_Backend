@@ -40,8 +40,8 @@ public class AuthController {
             be either 200 with two tokens which are access token and refresh token or 400 (bad request) with
             its message in body""")
     @PostMapping("/sign-up/verify")
-    public HttpEntity<?> signUpVerify(@RequestBody String verificationCode, HttpServletRequest request) {
-        return jwtService.signUpVerifyCode(verificationCode, request);
+    public HttpEntity<?> signUpVerify(@RequestBody CodeDTO codeDTO, HttpServletRequest request) {
+        return jwtService.signUpVerifyCode(codeDTO.verificationCode(), request);
     }
 
     @Operation(
@@ -71,8 +71,8 @@ public class AuthController {
             Receives the email that user entered. Response will be TempAuthorization token. 400 error code with
             its message in body""")
     @PostMapping("/login/forgot-password")
-    public HttpEntity<?> sendCode(@RequestBody String email) {
-        return jwtService.sendAccessCode(email);
+    public HttpEntity<?> sendCode(@RequestBody EmailDTO emailDTO) {
+        return jwtService.sendAccessCode(emailDTO.email());
     }
 
     @Operation(
@@ -80,9 +80,11 @@ public class AuthController {
             description = """
              This API receives TempAuthorization and the code that user has typed. 400 error code with its message in body""")
     @PostMapping("/login/confirm")
-    public HttpEntity<?> accountAccess(@RequestBody String verificationCode, HttpServletRequest request) {
-        return jwtService.checkVerificationCode(verificationCode, request);
+    public HttpEntity<?> accountAccess(@RequestBody CodeDTO codeDTO, HttpServletRequest request) {
+        return jwtService.checkVerificationCode(codeDTO.verificationCode(), request);
     }
-
-
 }
+
+record CodeDTO(String verificationCode) {}
+
+record EmailDTO(String email) {}
