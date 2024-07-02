@@ -2,9 +2,13 @@ package uz.audio_book.backend.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import uz.audio_book.backend.dto.CommentDTO;
+import uz.audio_book.backend.entity.Book;
 import uz.audio_book.backend.service.BookService;
 
 import java.util.UUID;
@@ -61,6 +65,11 @@ public class BookController {
     @GetMapping("{id}")
     public HttpEntity<?> getSelected(@PathVariable UUID id) {
         return bookService.getSelected(id);
+    }
+
+    @PostMapping("comment")
+    public HttpEntity<?> addComment(@RequestBody CommentDTO commentDTO) {
+        return bookService.saveComment(commentDTO);
     }
 
 

@@ -8,6 +8,7 @@ import uz.audio_book.backend.dto.UserDetailsDTO;
 import uz.audio_book.backend.entity.User;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public interface UserService {
@@ -27,4 +28,6 @@ public interface UserService {
     HttpEntity<?> updateUserPhoto(MultipartFile file);
 
     HttpEntity<?> getUserPhoto();
+
+    User findById(UUID uuid);
 }
