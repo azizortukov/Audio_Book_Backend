@@ -3,12 +3,15 @@ package uz.audio_book.backend.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uz.audio_book.backend.config.CustomUserDetailsService;
+import uz.audio_book.backend.dto.AccessTokenDTO;
 import uz.audio_book.backend.util.JwtUtil;
 
 @RestController
@@ -27,10 +30,12 @@ public class RefreshController {
             will be 200 (good status) or 403 (not found) when refresh token itself
             is expired""")
     @GetMapping
-    public String refresh() {
+    public HttpEntity<?> refresh() {
         String username = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
-        return jwtUtil.genToken(userDetails);
+        return ResponseEntity.ok(new AccessTokenDTO(
+                jwtUtil.genToken(userDetails))
+        );
     }
 
 }
