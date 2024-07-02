@@ -1,11 +1,13 @@
+let prefixUrl = 'http://localhost:8080';
+
 getBooks()
 
 function getBooks() {
     axios({
-        url: 'http://localhost:8080/api/admin/book',
+        url: prefixUrl + '/api/admin/book',
         method: 'GET',
         headers: {
-            'Authorization': localStorage.getItem('token')
+            'Authorization': localStorage.getItem('accessToken')
         }
     }).then(resp => {
         let innerHtml = '';
@@ -27,14 +29,14 @@ function getBooks() {
         document.getElementById('tbody').innerHTML = innerHtml;
     }).catch(e => {
         axios({
-            url: 'http://localhost:8080/api/refresh',
+            url:  prefixUrl + '/api/refresh',
             method: 'GET',
             headers: {
                 'Authorization': localStorage.getItem('refreshToken')
             }
         }).then(resp => {
             console.log(resp.data);
-            localStorage.setItem('token', resp.data)
+            localStorage.setItem('accessToken', resp.data.accessToken)
             getBooks()
         }).catch(e => {
             window.location.href = 'login.html'
@@ -44,25 +46,24 @@ function getBooks() {
 
 function deleteBook(bookId) {
     axios({
-        url: `http://localhost:8080/api/admin/book/${bookId}`,
+        url:  prefixUrl + `/api/admin/book/${bookId}`,
         method: 'DELETE',
         headers: {
-            'Authorization': localStorage.getItem('token')
+            'Authorization': localStorage.getItem('accessToken')
         }
     }).then(resp => {
         getBooks();
     }).catch(e => {
         console.log(e);
         axios({
-            url: 'http://localhost:8080/api/refresh',
+            url: prefixUrl + '/api/refresh',
             method: 'GET',
             headers: {
                 'Authorization': localStorage.getItem('refreshToken')
             }
         }).then(resp => {
             console.log(resp.data);
-            localStorage.setItem('token', resp.data)
-            // deleteBook(bookId)
+            localStorage.setItem('accessToken', resp.data.accessToken)
         }).catch(e => {
             console.log(e);
             window.location.href = 'login.html'

@@ -139,6 +139,7 @@ public class BookServiceImpl implements BookService {
         return ResponseEntity.ok(searchedBooks);
     }
 
+    @Override
     public HttpEntity<?> getSelected(UUID id) {
         SelectedBookProjection selectedBook = bookRepo.findSelectedBookByDetails(id);
         List<CommentProjection> bookComments = commentRepo.findByBookId(id);

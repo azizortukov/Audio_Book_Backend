@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import uz.audio_book.backend.service.BookService;
@@ -15,7 +14,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/file")
-@PreAuthorize("hasAnyRole('USER', 'ADMIN')")
 @Tag(name = "File API", description = "(Only for authorized users)")
 public class FileController {
 
@@ -73,7 +71,7 @@ public class FileController {
                     This API receives image named as file in form-data. Image will be uploaded for whom
                     logged in. Response will be either 200 (good status), 403 (unauthorized user) or
                     404 (user not found)""")
-    @PostMapping("/user/upload")
+    @PutMapping("/user/upload")
     public HttpEntity<?> uploadImage(@RequestParam("file") MultipartFile file) {
         return userService.updateUserPhoto(file);
     }

@@ -1,3 +1,4 @@
+let prefixUrl = 'http://localhost:8080';
 document.getElementById('loginForm').addEventListener('submit', function (event) {
     event.preventDefault();
 
@@ -5,7 +6,7 @@ document.getElementById('loginForm').addEventListener('submit', function (event)
     const password = document.getElementById('password').value;
 
     axios({
-        url: 'http://localhost:8080/api/auth/login',
+        url: prefixUrl + '/api/auth/login',
         method: 'POST',
         data: {
             email: email, password: password
@@ -14,7 +15,7 @@ document.getElementById('loginForm').addEventListener('submit', function (event)
         .then(response => {
 
             console.log(response.data)
-            localStorage.setItem('token', response.data.token)
+            localStorage.setItem('accessToken', response.data.accessToken)
             localStorage.setItem('refreshToken', response.data.refreshToken)
             window.location.href = 'admin.html';
         })

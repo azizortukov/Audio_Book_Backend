@@ -1,11 +1,13 @@
+let prefixUrl = 'http://localhost:8080';
+
 drawCategories()
 
 function drawCategories() {
     axios({
-        url: 'http://localhost:8080/api/admin/category',
+        url: prefixUrl + '/api/admin/category',
         method: 'GET',
         headers: {
-            'Authorization': localStorage.getItem('token')
+            'Authorization': localStorage.getItem('accessToken')
         }
     }).then(resp => {
         let innerHtml = ''
@@ -15,14 +17,14 @@ function drawCategories() {
         document.getElementById('genres').innerHTML = innerHtml;
     }).catch(e => {
         axios({
-            url: 'http://localhost:8080/api/refresh',
+            url: prefixUrl + '/api/refresh',
             method: 'GET',
             headers: {
                 'Authorization': localStorage.getItem('refreshToken')
             }
         }).then(resp => {
             console.log(resp.data);
-            localStorage.setItem('token', resp.data)
+            localStorage.setItem('accessToken', resp.data)
             drawCategories()
         }).catch(e => {
             window.location.href = 'login.html'
@@ -40,7 +42,7 @@ function sendData(event) {
         method: 'POST',
         body: new FormData(form),
         headers: {
-            'Authorization': localStorage.getItem('token')
+            'Authorization': localStorage.getItem('accessToken')
         }
     })
         .then(response => {
@@ -48,14 +50,14 @@ function sendData(event) {
         })
         .catch(e => {
             axios({
-                url: 'http://localhost:8080/api/refresh',
+                url: prefixUrl + '/api/refresh',
                 method: 'GET',
                 headers: {
                     'Authorization': localStorage.getItem('refreshToken')
                 }
             }).then(resp => {
                 console.log(resp.data);
-                localStorage.setItem('token', resp.data)
+                localStorage.setItem('accessToken', resp.data.accessToken)
                 sendData(event)
             }).catch(e => {
                 window.location.href = 'login.html'

@@ -34,7 +34,7 @@ public class UserController {
                     200 (good status) when user details are updated, 400 (bad request) if sent
                     birth date format is wrong, 404 (not found) when user is not found from db,
                     403 user is not logged in""")
-    @PostMapping("/edit")
+    @PutMapping("/edit")
     public HttpEntity<?> updateUser(@RequestBody UserDetailsDTO userDetailsDTO) {
         return userService.updateUserDetails(userDetailsDTO);
     }
