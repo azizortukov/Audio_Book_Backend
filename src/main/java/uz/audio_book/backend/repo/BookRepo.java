@@ -103,19 +103,19 @@ public interface BookRepo extends JpaRepository<Book, UUID> {
     List<AdminBookProjection> findAllAdminBookProjection();
 
     @Query(value = """
-            SELECT b.id,
-                    b.title,
-                    b.author,
-                    ARRAY_AGG(DISTINCT bc.categories_id) AS categoryIds,
-                    ROUND((SELECT SUM(c.rating) * 1.0 / COUNT(*)
-                           FROM comment c
-                           WHERE c.book_id = b.id), 2) AS rating
-             FROM book b
-                      JOIN book_categories bc ON b.id = bc.book_id
-                      JOIN comment c on b.id = c.book_id
-             WHERE b.title ILIKE :searchBy OR b.author ILIKE :searchBy
-             GROUP BY b.id
-                         """, nativeQuery = true)
+           SELECT b.id,
+                   b.title,
+                   b.author,
+                   ARRAY_AGG(DISTINCT bc.categories_id) AS categoryIds,
+                   ROUND((SELECT SUM(c.rating) * 1.0 / COUNT(*)
+                          FROM comment c
+                          WHERE c.book_id = b.id), 2) AS rating
+            FROM book b
+                    JOIN book_categories bc ON b.id = bc.book_id
+                    LEFT JOIN comment c on b.id = c.book_id
+            WHERE b.title ILIKE :searchBy OR b.author ILIKE :searchBy
+            GROUP BY b.id
+                        """, nativeQuery = true)
     List<BookProjection> findAllByAuthorOrTitle(String searchBy);
 
     @Query(value = """
@@ -129,10 +129,10 @@ public interface BookRepo extends JpaRepository<Book, UUID> {
                    b.description
             FROM book b
                      JOIN book_categories bc ON b.id = bc.book_id
-                     JOIN comment c on b.id = c.book_id
+                     LEFT JOIN comment c on b.id = c.book_id
                      JOIN category ct on bc.categories_id = ct.id
             WHERE b.id =:id
-            GROUP BY b.id, b.title, b.author
+            GROUP BY b.id
                          """, nativeQuery = true)
     SelectedBookProjection findSelectedBookByDetails(UUID id);
 }

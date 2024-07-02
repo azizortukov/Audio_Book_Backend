@@ -6,10 +6,14 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
+import uz.audio_book.backend.dto.CommentDTO;
 import uz.audio_book.backend.entity.Book;
 import uz.audio_book.backend.entity.Category;
+import uz.audio_book.backend.entity.Comment;
 import uz.audio_book.backend.entity.User;
 import uz.audio_book.backend.projection.BookProjection;
 import uz.audio_book.backend.projection.CommentProjection;
@@ -17,6 +21,7 @@ import uz.audio_book.backend.projection.SelectedBookProjection;
 import uz.audio_book.backend.repo.BookRepo;
 import uz.audio_book.backend.repo.CategoryRepo;
 import uz.audio_book.backend.repo.CommentRepo;
+
 import java.util.*;
 
 @Service
@@ -27,6 +32,7 @@ public class BookServiceImpl implements BookService {
     private final CategoryRepo categoryRepo;
     private final UserService userService;
     private final CommentRepo commentRepo;
+
 
     @Override
     public HttpEntity<?> getBooksProjection() {
@@ -39,7 +45,7 @@ public class BookServiceImpl implements BookService {
         User user = userService.getUserFromContextHolder().get();
         List<UUID> ids = user.getPersonalCategories().stream().map(Category::getId).toList();
 
-        List<BookProjection> newRelease =  bookRepo.findNewRelease();
+        List<BookProjection> newRelease = bookRepo.findNewRelease();
         List<BookProjection> trendingNow = bookRepo.findTrendingNow();
         List<BookProjection> bestSeller = bookRepo.findBestSeller();
         List<BookProjection> recommended = new ArrayList<>();
@@ -150,4 +156,32 @@ public class BookServiceImpl implements BookService {
         return ResponseEntity.ok(result);
     }
 
+    @Override
+    public HttpEntity<?> saveComment(@RequestBody CommentDTO commentDTO) {
+        Optional<User> userOpt = userService.getUserFromContextHolder();
+        if (userOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        User user = userOpt.get();
+        Comment comment = commentRepo.findByUserIdAndBookId(user.getId(), commentDTO.bookId());
+        if (comment != null) {
+            comment.setRating(commentDTO.rating());
+            comment.setBody(commentDTO.body());
+            commentRepo.save(comment);
+        } else {
+            Book book = findById(commentDTO.bookId());
+            commentRepo.save(Comment.builder()
+                    .user(user)
+                    .book(book)
+                    .rating(commentDTO.rating())
+                    .body(commentDTO.body())
+                    .build());
+        }
+        return ResponseEntity.status(201).body("success");
+    }
+
+    @Override
+    public Book findById(UUID uuid) {
+        return bookRepo.findById(uuid).orElse(null);
+    }
 }

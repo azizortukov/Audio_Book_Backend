@@ -20,6 +20,7 @@ import uz.audio_book.backend.util.DateUtil;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -111,5 +112,10 @@ public class UserServiceImpl implements UserService {
     public Optional<User> getUserFromContextHolder() {
         String userEmail = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
         return findByEmail(userEmail);
+    }
+
+    @Override
+    public User findById(UUID uuid) {
+        return userRepo.findById(uuid).orElse(null);
     }
 }
