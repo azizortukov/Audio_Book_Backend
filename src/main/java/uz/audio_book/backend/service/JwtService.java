@@ -30,6 +30,9 @@ public class JwtService {
         if (!DateUtil.isValidFormat(signUpDto.getBirthDate())) {
             return ResponseEntity.badRequest().body("Birth date is incorrect");
         }
+        if (userService.existsByEmail(signUpDto.getEmail())) {
+            return ResponseEntity.badRequest().body("User already exists!");
+        }
         return ResponseEntity.ok(jwtUtil.generateVerificationCodeToken(signUpDto));
     }
 

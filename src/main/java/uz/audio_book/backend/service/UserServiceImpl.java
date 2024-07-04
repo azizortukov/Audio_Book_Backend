@@ -118,4 +118,9 @@ public class UserServiceImpl implements UserService {
     public User findById(UUID uuid) {
         return userRepo.findById(uuid).orElse(null);
     }
+
+    @Override
+    public boolean existsByEmail(String email) {
+         return userRepo.findByEmail(email).isPresent();
+    }
 }

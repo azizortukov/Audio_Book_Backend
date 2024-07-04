@@ -30,4 +30,6 @@ public interface UserService {
     HttpEntity<?> getUserPhoto();
 
     User findById(UUID uuid);
+
+    boolean existsByEmail(String email);
 }

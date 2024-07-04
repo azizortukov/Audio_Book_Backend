@@ -6,7 +6,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
@@ -91,7 +90,7 @@ public class BookServiceImpl implements BookService {
     @Override
     public HttpEntity<?> sendBookPicture(UUID bookId) {
         Optional<Book> bookById = bookRepo.findById(bookId);
-        if (bookById.isEmpty()) {
+        if (bookById.isEmpty() || bookById.get().getPhoto() == null) {
             return ResponseEntity.notFound().build();
         }
         Book book = bookById.get();
