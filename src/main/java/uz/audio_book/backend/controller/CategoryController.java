@@ -35,8 +35,8 @@ public class CategoryController {
             This API receives list of category ids. Then, sets that categories
             to user preferred categories""")
     @PostMapping("/customize")
-    public HttpEntity<?> customizeCategory(@RequestBody List<UUID> categoryIds) {
-        return categoryService.customizeCategoryByIds(categoryIds);
+    public HttpEntity<?> customizeCategory(@RequestBody CategoryIdsDTO categoryIds) {
+        return categoryService.customizeCategoryByIds(categoryIds.categoryIds());
     }
 
     @Operation(
@@ -57,3 +57,4 @@ public class CategoryController {
         return categoryService.getRecommendedCategories();
     }
 }
+record CategoryIdsDTO(List<UUID> categoryIds){}

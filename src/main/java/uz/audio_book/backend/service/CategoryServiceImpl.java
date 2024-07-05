@@ -30,8 +30,6 @@ public class CategoryServiceImpl implements CategoryService {
     public HttpEntity<?> customizeCategoryByIds(List<UUID> categoryIds) {
         Optional<User> user = userService.getUserFromContextHolder();
         List<Category> categories = categoryRepo.findAllById(categoryIds);
-        System.out.println("user: " + user);
-        System.out.println("categories: " + categories);
         if (user.isPresent()) {
             user.get().getPersonalCategories().addAll(categories);
             userRepo.save(user.get());

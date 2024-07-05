@@ -72,7 +72,6 @@ public class JwtService {
                    jwtUtil.genToken((UserDetails) auth.getPrincipal()),
                    jwtUtil.genRefreshToken((UserDetails) auth.getPrincipal())));
        }catch (AuthenticationException e) {
-           System.out.println("coming");
            return ResponseEntity.badRequest().body("Email or password is incorrect!");
        }
     }

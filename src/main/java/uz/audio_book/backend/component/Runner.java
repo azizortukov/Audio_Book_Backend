@@ -38,7 +38,7 @@ public class Runner implements CommandLineRunner {
             List<Category> categories = new ArrayList<>();
             for (int i = 0; i < 10; i++) {
                 Category category = categoryRepo.save(Category.builder()
-                        .name(faker.book().genre() + i)
+                        .name(faker.book().genre())
                         .build());
                 categories.add(category);
             }
