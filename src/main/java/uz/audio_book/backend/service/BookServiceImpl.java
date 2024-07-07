@@ -49,9 +49,9 @@ public class BookServiceImpl implements BookService {
         List<BookProjection> bestSeller = bookRepo.findBestSeller();
         List<BookProjection> recommended = new ArrayList<>();
         if (ids.isEmpty()) {
-            recommended = bookRepo.findByPersonalCategories(ids);
-        } else {
             recommended = trendingNow;
+        } else {
+            recommended = bookRepo.findByPersonalCategories(ids);
         }
         Map<String, Object> result = new LinkedHashMap<>();
         result.put("recommended", recommended);

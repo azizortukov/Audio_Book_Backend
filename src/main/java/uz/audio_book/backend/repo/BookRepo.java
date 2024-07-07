@@ -68,7 +68,7 @@ public interface BookRepo extends JpaRepository<Book, UUID> {
                           WHERE c.book_id = b.id), 2) AS rating
             FROM book b
                      JOIN book_categories bc ON b.id = bc.book_id
-                     JOIN comment c on b.id = c.book_id
+                     LEFT JOIN comment c on b.id = c.book_id
             GROUP BY b.id, b.title, b.author
             ORDER BY count(c.*) DESC
             LIMIT 6
@@ -85,7 +85,7 @@ public interface BookRepo extends JpaRepository<Book, UUID> {
                           WHERE c.book_id = b.id), 2) AS rating
             FROM book b
                      JOIN book_categories bc ON b.id = bc.book_id
-                     JOIN comment c on b.id = c.book_id
+                     LEFT JOIN comment c on b.id = c.book_id
             GROUP BY b.id, b.title, b.author
             ORDER BY RANDOM()
             LIMIT 6
