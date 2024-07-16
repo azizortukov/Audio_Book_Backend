@@ -14,6 +14,9 @@ import uz.audio_book.backend.entity.Book;
 import uz.audio_book.backend.entity.Category;
 import uz.audio_book.backend.entity.Comment;
 import uz.audio_book.backend.entity.User;
+import uz.audio_book.backend.exceptions.ContentNotFound;
+import uz.audio_book.backend.exceptions.NotFoundException;
+import uz.audio_book.backend.exceptions.UserNotFoundException;
 import uz.audio_book.backend.projection.BookProjection;
 import uz.audio_book.backend.projection.CommentProjection;
 import uz.audio_book.backend.projection.SelectedBookProjection;
@@ -47,7 +50,7 @@ public class BookServiceImpl implements BookService {
         List<BookProjection> newRelease = bookRepo.findNewRelease();
         List<BookProjection> trendingNow = bookRepo.findTrendingNow();
         List<BookProjection> bestSeller = bookRepo.findBestSeller();
-        List<BookProjection> recommended = new ArrayList<>();
+        List<BookProjection> recommended;
         if (ids.isEmpty()) {
             recommended = trendingNow;
         } else {
@@ -90,8 +93,11 @@ public class BookServiceImpl implements BookService {
     @Override
     public HttpEntity<?> sendBookPicture(UUID bookId) {
         Optional<Book> bookById = bookRepo.findById(bookId);
-        if (bookById.isEmpty() || bookById.get().getPhoto() == null) {
-            return ResponseEntity.notFound().build();
+        if (bookById.isEmpty()) {
+            throw new NotFoundException("Sorry, book is not found!");
+        }
+        if (bookById.get().getPhoto() == null) {
+            throw new ContentNotFound("Sorry, book image is not found!");
         }
         Book book = bookById.get();
         HttpHeaders headers = new HttpHeaders();
@@ -108,7 +114,10 @@ public class BookServiceImpl implements BookService {
     public HttpEntity<?> sendBookPDF(UUID bookId) {
         Optional<Book> bookById = bookRepo.findById(bookId);
         if (bookById.isEmpty()) {
-            return ResponseEntity.notFound().build();
+            throw new NotFoundException("Sorry, book is not found!");
+        }
+        if (bookById.get().getPdf() == null) {
+            throw new ContentNotFound("Sorry, book pdf file is not found!");
         }
         Book book = bookById.get();
         HttpHeaders headers = new HttpHeaders();
@@ -124,7 +133,10 @@ public class BookServiceImpl implements BookService {
     public HttpEntity<?> sendBookAudio(UUID bookId) {
         Optional<Book> bookById = bookRepo.findById(bookId);
         if (bookById.isEmpty()) {
-            return ResponseEntity.notFound().build();
+            throw new NotFoundException("Sorry, book is not found!");
+        }
+        if (bookById.get().getAudio() == null) {
+            throw new ContentNotFound("Sorry, book audio file is not found!");
         }
         Book book = bookById.get();
         HttpHeaders headers = new HttpHeaders();
@@ -140,18 +152,17 @@ public class BookServiceImpl implements BookService {
     @Override
     public HttpEntity<?> getByAuthorOrTitle(String search) {
         String searchBy = "%" + search + "%";
-        List<BookProjection> searchedBooks = bookRepo.findAllByAuthorOrTitle(searchBy);
+        List<SelectedBookProjection> searchedBooks = bookRepo.findAllByAuthorOrTitle(searchBy);
         return ResponseEntity.ok(searchedBooks);
     }
 
     @Override
     public HttpEntity<?> getSelected(UUID id) {
-        SelectedBookProjection selectedBook = bookRepo.findSelectedBookByDetails(id);
+        SelectedBookProjection book = bookRepo.findSelectedBookByDetails(id);
         List<CommentProjection> bookComments = commentRepo.findByBookId(id);
-        List<Object> result = List.of(
-                selectedBook,
-                bookComments
-        );
+        Map<Object, Object> result = new LinkedHashMap<>();
+        result.put("book", book);
+        result.put("comments", bookComments);
         return ResponseEntity.ok(result);
     }
 
@@ -159,28 +170,28 @@ public class BookServiceImpl implements BookService {
     public HttpEntity<?> saveComment(@RequestBody CommentDTO commentDTO) {
         Optional<User> userOpt = userService.getUserFromContextHolder();
         if (userOpt.isEmpty()) {
-            return ResponseEntity.notFound().build();
+            throw new UserNotFoundException("Sorry, user's session is expired!");
         }
         User user = userOpt.get();
+        // Checking if user left comment before, if yes then comment will be updated, if no then
+        // new comment will be added
         Comment comment = commentRepo.findByUserIdAndBookId(user.getId(), commentDTO.bookId());
         if (comment != null) {
             comment.setRating(commentDTO.rating());
             comment.setBody(commentDTO.body());
             commentRepo.save(comment);
         } else {
-            Book book = findById(commentDTO.bookId());
+            Optional<Book> book = bookRepo.findById(commentDTO.bookId());
+            if (book.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
             commentRepo.save(Comment.builder()
                     .user(user)
-                    .book(book)
+                    .book(book.get())
                     .rating(commentDTO.rating())
                     .body(commentDTO.body())
                     .build());
         }
-        return ResponseEntity.status(201).body("success");
-    }
-
-    @Override
-    public Book findById(UUID uuid) {
-        return bookRepo.findById(uuid).orElse(null);
+        return ResponseEntity.ok("success");
     }
 }

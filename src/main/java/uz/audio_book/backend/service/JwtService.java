@@ -13,6 +13,10 @@ import uz.audio_book.backend.dto.LoginDTO;
 import uz.audio_book.backend.dto.SignUpDTO;
 import uz.audio_book.backend.dto.TokenDTO;
 import uz.audio_book.backend.entity.User;
+import uz.audio_book.backend.exceptions.BadRequestException;
+import uz.audio_book.backend.exceptions.HeaderException;
+import uz.audio_book.backend.exceptions.NotFoundException;
+import uz.audio_book.backend.exceptions.UserNotFoundException;
 import uz.audio_book.backend.util.DateUtil;
 import uz.audio_book.backend.util.JwtUtil;
 
@@ -28,10 +32,10 @@ public class JwtService {
 
     public HttpEntity<?> giveAccountDetailsToken(SignUpDTO signUpDto) {
         if (!DateUtil.isValidFormat(signUpDto.getBirthDate())) {
-            return ResponseEntity.badRequest().body("Birth date is incorrect");
+            throw new BadRequestException("Birth date format is incorrect");
         }
         if (userService.existsByEmail(signUpDto.getEmail())) {
-            return ResponseEntity.badRequest().body("User already exists!");
+            throw new BadRequestException("User already exists!");
         }
         return ResponseEntity.ok(jwtUtil.generateVerificationCodeToken(signUpDto));
     }
@@ -39,7 +43,7 @@ public class JwtService {
     public ResponseEntity<?> signUpVerifyCode(String verificationCode, HttpServletRequest request) {
         String confirmation = request.getHeader("TempAuthorization");
         if (confirmation == null || !confirmation.startsWith("Confirmation")) {
-            return ResponseEntity.badRequest().body("Entered code is wrong! Please, try again!");
+            throw new HeaderException("Expected TempAuthorization token in the header!");
         }
         String token = confirmation.substring(13);
         if (jwtUtil.checkVerificationCodeFromDto(verificationCode, token)) {
@@ -48,14 +52,14 @@ public class JwtService {
                     jwtUtil.genToken(user),
                     jwtUtil.genRefreshToken(user)));
         } else {
-            return ResponseEntity.badRequest().body("Entered code is wrong! Please, try again!");
+            throw new BadRequestException("Entered code is wrong! Please, try again!");
         }
     }
 
     public ResponseEntity<?> resendSignUpVerificationCode(HttpServletRequest request) {
         String confirmation = request.getHeader("TempAuthorization");
         if (confirmation == null || !confirmation.startsWith("Confirmation")) {
-            return ResponseEntity.badRequest().body("Session is expired! Please, return to sign up page!");
+            throw new BadRequestException("Session is expired! Please, return to sign up page!");
         }
         String token = confirmation.substring(13);
         SignUpDTO dto = jwtUtil.getDtoFromToken(token);
@@ -72,14 +76,14 @@ public class JwtService {
                    jwtUtil.genToken((UserDetails) auth.getPrincipal()),
                    jwtUtil.genRefreshToken((UserDetails) auth.getPrincipal())));
        }catch (AuthenticationException e) {
-           return ResponseEntity.badRequest().body("Email or password is incorrect!");
+           throw new UserNotFoundException("Email or password is incorrect. Please try again!");
        }
     }
 
     public ResponseEntity<?> sendAccessCode(String email) {
         var user = userService.findByEmail(email);
         if (user.isEmpty()) {
-            return ResponseEntity.badRequest().body("User doesn't exist!");
+            throw new NotFoundException("User doesn't exist. Please try again!");
         }
         return ResponseEntity.ok(jwtUtil.generateCodeToken(email));
     }
@@ -96,8 +100,9 @@ public class JwtService {
                         jwtUtil.genRefreshToken(user.get())
                 ));
             }
+            throw new BadRequestException("Entered code is wrong! Please, try again!");
         }
-        return ResponseEntity.badRequest().body("Entered code is wrong! Please, try again!");
+        throw new HeaderException("Expected TempAuthorization token in the header!");
     }
 
 }

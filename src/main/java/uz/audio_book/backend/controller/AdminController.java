@@ -3,6 +3,7 @@ package uz.audio_book.backend.controller;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,7 +28,7 @@ public class AdminController {
         return bookService.getAdminProjection();
     }
 
-    @PostMapping("/book")
+    @PostMapping(value = "/book", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public HttpEntity<?> addBook(@RequestParam("title") String title,
                                  @RequestParam("author") String author,
                                  @RequestParam("description") String description,

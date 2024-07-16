@@ -14,13 +14,15 @@ import uz.audio_book.backend.dto.SignUpDTO;
 import uz.audio_book.backend.dto.UserDetailsDTO;
 import uz.audio_book.backend.entity.User;
 import uz.audio_book.backend.entity.enums.RoleName;
+import uz.audio_book.backend.exceptions.BadRequestException;
+import uz.audio_book.backend.exceptions.ContentNotFound;
+import uz.audio_book.backend.exceptions.UserNotFoundException;
 import uz.audio_book.backend.repo.UserRepo;
 import uz.audio_book.backend.util.DateUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -56,14 +58,13 @@ public class UserServiceImpl implements UserService {
         if (user.isPresent()) {
             return ResponseEntity.ok(userRepo.findByIdProjection(user.get().getId()));
         }
-        return ResponseEntity.notFound().build();
+        throw new UserNotFoundException("Sorry, user's session is expired!");
     }
 
     @Override
     public HttpEntity<?> updateUserDetails(UserDetailsDTO userDetailsDTO) {
         if (!DateUtil.isValidFormat(userDetailsDTO.birthDate())) {
-            return ResponseEntity.badRequest()
-                    .body("Birth date is not a valid format");
+            throw new BadRequestException("Birth date format is incorrect!");
         }
         Optional<User> contextUser = getUserFromContextHolder();
         if (contextUser.isPresent()) {
@@ -86,9 +87,10 @@ public class UserServiceImpl implements UserService {
             userRepo.save(user.get());
             return ResponseEntity.ok("User profile image updated successfully");
         }
-        return ResponseEntity.notFound().build();
+        throw new UserNotFoundException("User is not authorized");
     }
 
+    @SneakyThrows
     @Override
     public HttpEntity<?> getUserPhoto() {
         Optional<User> user = getUserFromContextHolder();
@@ -102,21 +104,16 @@ public class UserServiceImpl implements UserService {
                         .contentType(MediaType.IMAGE_JPEG)
                         .body(user.get().getProfilePhoto());
             } catch (NullPointerException e) {
-                return ResponseEntity.noContent().build();
+                throw new ContentNotFound("User don't have profile photo");
             }
         }
-        return ResponseEntity.notFound().build();
+        throw new UserNotFoundException("User is not authorized");
     }
 
     @Override
     public Optional<User> getUserFromContextHolder() {
         String userEmail = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
         return findByEmail(userEmail);
-    }
-
-    @Override
-    public User findById(UUID uuid) {
-        return userRepo.findById(uuid).orElse(null);
     }
 
     @Override

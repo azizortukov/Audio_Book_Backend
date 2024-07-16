@@ -19,9 +19,8 @@ public class UserController {
     @Operation(
             summary = "User Info API",
             description = """
-                    This API sends info about user who is logged in. Response will be
-                    200 (good status) with user details, 404 (not found) when user is not
-                    found from db, 403 user is not logged in""")
+                    This API sends info about user who is logged in. The responses are
+                    200 (success) with user details, 403(forbidden) user is not logged in""")
     @GetMapping("/me")
     public HttpEntity<?> getUserById() {
         return userService.getUserDetails();
@@ -31,8 +30,8 @@ public class UserController {
         summary = "User Info Update API",
         description = """
                     This API receives new info about user who is logged in. Response will be
-                    200 (good status) when user details are updated, 400 (bad request) if sent
-                    birth date format is wrong, 404 (not found) when user is not found from db,
+                    200 (success) when user details are updated, 400 (bad request) if sent
+                    birth date format is wrong, 400 (bad request) birth date format is wrong,
                     403 user is not logged in""")
     @PutMapping("/edit")
     public HttpEntity<?> updateUser(@RequestBody UserDetailsDTO userDetailsDTO) {

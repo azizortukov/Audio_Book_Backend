@@ -4,7 +4,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import uz.audio_book.backend.dto.CommentDTO;
-import uz.audio_book.backend.entity.Book;
 
 import java.util.List;
 import java.util.UUID;
@@ -33,6 +32,4 @@ public interface BookService {
     HttpEntity<?> getSelected(UUID id);
 
     HttpEntity<?> saveComment(CommentDTO commentDTO);
-
-    Book findById(UUID uuid);
 }

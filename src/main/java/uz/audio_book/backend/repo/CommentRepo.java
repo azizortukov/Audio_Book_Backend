@@ -17,8 +17,7 @@ public interface CommentRepo extends JpaRepository<Comment, UUID> {
             from comment c
                 join users u on c.user_id = u.id
                 join book b on c.book_id = b.id
-            where b.id = :id
-                        """, nativeQuery = true)
+            where b.id = :id""", nativeQuery = true)
     List<CommentProjection> findByBookId(UUID id);
 
     Comment findByUserIdAndBookId(UUID userId, UUID bookId);

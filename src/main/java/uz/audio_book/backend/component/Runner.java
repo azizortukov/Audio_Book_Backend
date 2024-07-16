@@ -47,7 +47,7 @@ public class Runner implements CommandLineRunner {
                             roleRepo.findByRoleName(RoleName.ROLE_USER)
                     ))
                     .birthDate(LocalDate.of(2003, 5, 22))
-                    .email("eshmat")
+                    .email("eshmat@gmail.com")
                     .password(passwordEncoder.encode("123"))
                     .personalCategories(List.of(
                             categories.get(0),
@@ -60,7 +60,7 @@ public class Runner implements CommandLineRunner {
                             roleRepo.findByRoleName(RoleName.ROLE_ADMIN)
                     ))
                     .birthDate(LocalDate.of(2000, 11, 29))
-                    .email("toshmat")
+                    .email("toshmat@gmail.com")
                     .displayName("Toshmat Toshmatjonov")
                     .password(passwordEncoder.encode("123"))
                     .personalCategories(List.of(

@@ -2,6 +2,8 @@ package uz.audio_book.backend.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,7 +25,7 @@ public class CategoryController {
     @Operation(
             summary = "Category API",
             description = """
-            This API returns list of all categories""")
+            This API returns list of all categories.""")
     @GetMapping
     public HttpEntity<?> getCategory() {
         return categoryService.getCategories();
@@ -33,9 +35,9 @@ public class CategoryController {
             summary = "Category Customization API",
             description = """
             This API receives list of category ids. Then, sets that categories
-            to user preferred categories""")
+            to user preferred categories list.""")
     @PostMapping("/customize")
-    public HttpEntity<?> customizeCategory(@RequestBody CategoryIdsDTO categoryIds) {
+    public HttpEntity<?> customizeCategory(@RequestBody @Valid CategoryIdsDTO categoryIds) {
         return categoryService.customizeCategoryByIds(categoryIds.categoryIds());
     }
 
@@ -57,4 +59,4 @@ public class CategoryController {
         return categoryService.getRecommendedCategories();
     }
 }
-record CategoryIdsDTO(List<UUID> categoryIds){}
+record CategoryIdsDTO(@NotNull List<UUID> categoryIds){}
