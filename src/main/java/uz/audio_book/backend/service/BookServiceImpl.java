@@ -1,5 +1,6 @@
 package uz.audio_book.backend.service;
 
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.http.HttpEntity;
@@ -86,12 +87,12 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public void deleteById(UUID bookId) {
+    public void deleteById(@NonNull UUID bookId) {
         bookRepo.deleteById(bookId);
     }
 
     @Override
-    public HttpEntity<?> sendBookPicture(UUID bookId) {
+    public HttpEntity<?> sendBookPicture(@NonNull UUID bookId) {
         Optional<Book> bookById = bookRepo.findById(bookId);
         if (bookById.isEmpty()) {
             throw new NotFoundException("Sorry, book is not found!");
@@ -111,7 +112,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public HttpEntity<?> sendBookPDF(UUID bookId) {
+    public HttpEntity<?> sendBookPDF(@NonNull UUID bookId) {
         Optional<Book> bookById = bookRepo.findById(bookId);
         if (bookById.isEmpty()) {
             throw new NotFoundException("Sorry, book is not found!");
@@ -130,7 +131,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public HttpEntity<?> sendBookAudio(UUID bookId) {
+    public HttpEntity<?> sendBookAudio(@NonNull UUID bookId) {
         Optional<Book> bookById = bookRepo.findById(bookId);
         if (bookById.isEmpty()) {
             throw new NotFoundException("Sorry, book is not found!");
@@ -150,14 +151,17 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public HttpEntity<?> getByAuthorOrTitle(String search) {
+    public HttpEntity<?> getByAuthorOrTitle(@NonNull String search) {
         String searchBy = "%" + search + "%";
         List<SelectedBookProjection> searchedBooks = bookRepo.findAllByAuthorOrTitle(searchBy);
         return ResponseEntity.ok(searchedBooks);
     }
 
     @Override
-    public HttpEntity<?> getSelected(UUID id) {
+    public HttpEntity<?> getSelected(@NonNull UUID id) {
+        if (!bookRepo.existsById(id)) {
+            throw new NotFoundException("Sorry, book is not found!");
+        }
         SelectedBookProjection book = bookRepo.findSelectedBookByDetails(id);
         List<CommentProjection> bookComments = commentRepo.findByBookId(id);
         Map<Object, Object> result = new LinkedHashMap<>();
@@ -183,7 +187,7 @@ public class BookServiceImpl implements BookService {
         } else {
             Optional<Book> book = bookRepo.findById(commentDTO.bookId());
             if (book.isEmpty()) {
-                return ResponseEntity.notFound().build();
+                throw new NotFoundException("Sorry, book is not found!");
             }
             commentRepo.save(Comment.builder()
                     .user(user)

@@ -84,6 +84,14 @@ public class GlobalExceptionHandler {
                 .body(null);
     }
 
+    @ExceptionHandler(NullPointerException.class)
+    public HttpEntity<?> handleNullPointerException(NullPointerException e) {
+        log.warn(e.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body("Param cannot be null!");
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<?> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         Map<String, Object> errors = new HashMap<>();
