@@ -30,6 +30,9 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public HttpEntity<?> customizeCategoryByIds(List<UUID> categoryIds) {
         Optional<User> user = userService.getUserFromContextHolder();
+        if (categoryIds.isEmpty()) {
+            throw new NullPointerException("Category IDs can't be empty");
+        }
         List<Category> categories = categoryRepo.findAllById(categoryIds);
         if (user.isEmpty()) {
             throw new UserNotFoundException("Sorry, user's session is expired!");
