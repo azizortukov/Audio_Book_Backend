@@ -2,6 +2,7 @@ package uz.audio_book.backend.service;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -30,7 +31,8 @@ public class JwtService {
     private final UserService userService;
     private final AuthenticationManager authenticationManager;
 
-    public HttpEntity<?> giveAccountDetailsToken(SignUpDTO signUpDto) {
+
+    public ResponseEntity<?> giveAccountDetailsToken(SignUpDTO signUpDto) {
         if (!DateUtil.isValidFormat(signUpDto.getBirthDate())) {
             throw new BadRequestException("Birth date format is incorrect");
         }
@@ -45,7 +47,7 @@ public class JwtService {
         if (confirmation == null || !confirmation.startsWith("Confirmation")) {
             throw new HeaderException("Expected TempAuthorization token in the header!");
         }
-        String token = confirmation.substring(13);
+        String token = confirmation.substring(13); // return back
         if (jwtUtil.checkVerificationCodeFromDto(verificationCode, token)) {
             User user = userService.saveUserFromDto(jwtUtil.getDtoFromToken(token));
             return ResponseEntity.ok(new TokenDTO(
@@ -59,7 +61,7 @@ public class JwtService {
     public ResponseEntity<?> resendSignUpVerificationCode(HttpServletRequest request) {
         String confirmation = request.getHeader("TempAuthorization");
         if (confirmation == null || !confirmation.startsWith("Confirmation")) {
-            throw new BadRequestException("Session is expired! Please, return to sign up page!");
+            throw new HeaderException("Session is expired! Please, return to sign up page!");
         }
         String token = confirmation.substring(13);
         SignUpDTO dto = jwtUtil.getDtoFromToken(token);
@@ -68,7 +70,7 @@ public class JwtService {
         );
     }
 
-    public HttpEntity<?> checkLoginDetails(LoginDTO loginDto) {
+    public ResponseEntity<?> checkLoginDetails(LoginDTO loginDto) {
        try {
            var auth = authenticationManager.authenticate(
                    new UsernamePasswordAuthenticationToken(loginDto.email(), loginDto.password()));
@@ -90,7 +92,7 @@ public class JwtService {
 
     public ResponseEntity<?> checkVerificationCode(String verificationCode, HttpServletRequest request) {
         String confirmation = request.getHeader("TempAuthorization");
-        if (confirmation != null && confirmation.startsWith("Confirmation")) {
+            if (confirmation != null && confirmation.startsWith("Confirmation")) {
             String token = confirmation.substring(13);
             if (jwtUtil.checkVerification(verificationCode, token)) {
                 Optional<User> user = userService.findByEmail(
