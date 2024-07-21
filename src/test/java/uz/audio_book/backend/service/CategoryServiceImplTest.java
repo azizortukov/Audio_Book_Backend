@@ -2,7 +2,6 @@ package uz.audio_book.backend.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uz.audio_book.backend.entity.Category;
@@ -15,7 +14,7 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 class CategoryServiceImplTest {
 
@@ -27,9 +26,9 @@ class CategoryServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        categoryRepo = Mockito.mock(CategoryRepo.class);
-        userRepo = Mockito.mock(UserRepo.class);
-        userService = Mockito.mock(UserService.class);
+        categoryRepo = mock(CategoryRepo.class);
+        userRepo = mock(UserRepo.class);
+        userService = mock(UserService.class);
         categoryService = new CategoryServiceImpl(categoryRepo, userRepo, userService);
     }
 

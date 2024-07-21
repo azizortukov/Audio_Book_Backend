@@ -2,8 +2,6 @@ package uz.audio_book.backend.service;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -77,7 +75,7 @@ public class JwtService {
            return ResponseEntity.ok(new TokenDTO(
                    jwtUtil.genToken((UserDetails) auth.getPrincipal()),
                    jwtUtil.genRefreshToken((UserDetails) auth.getPrincipal())));
-       }catch (AuthenticationException e) {
+       } catch (AuthenticationException e) {
            throw new UserNotFoundException("Email or password is incorrect. Please try again!");
        }
     }

@@ -2,7 +2,6 @@ package uz.audio_book.backend.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -39,10 +38,10 @@ class BookServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        bookRepo = Mockito.mock(BookRepo.class);
-        categoryRepo = Mockito.mock(CategoryRepo.class);
-        userService = Mockito.mock(UserService.class);
-        commentRepo = Mockito.mock(CommentRepo.class);
+        bookRepo = mock(BookRepo.class);
+        categoryRepo = mock(CategoryRepo.class);
+        userService = mock(UserService.class);
+        commentRepo = mock(CommentRepo.class);
         bookService = new BookServiceImpl(bookRepo, categoryRepo, userService, commentRepo);
         book = Book.builder()
                 .title("Title")
@@ -218,10 +217,10 @@ class BookServiceImplTest {
 
     @Test
     void sendBookAudioBookAudioNotFound() {
-        book.setPdf(null);
+        book.setAudio(null);
         when(bookRepo.findById(any(UUID.class)))
                 .thenReturn(Optional.of(book));
-        assertThrows(ContentNotFound.class, () -> bookService.sendBookPDF(UUID.randomUUID()));
+        assertThrows(ContentNotFound.class, () -> bookService.sendBookAudio(UUID.randomUUID()));
     }
 
     @Test
@@ -278,7 +277,7 @@ class BookServiceImplTest {
     }
 
     @Test
-    void saveComment() {
+    void saveCommentUserHasComment() {
         when(userService.getUserFromContextHolder())
                 .thenReturn(Optional.of(User
                         .builder()
@@ -293,5 +292,45 @@ class BookServiceImplTest {
 
         assertEquals(HttpStatus.OK, resp.getStatusCode());
         assertEquals(resp.getBody(), "success");
+    }
+
+    @Test
+    void saveCommentUserHasNotCommentAndBookNotFound() {
+        User user = User.builder()
+                .personalCategories(new ArrayList<>(){{
+                    add(new Category());
+                }})
+                .build();
+
+        when(userService.getUserFromContextHolder())
+                .thenReturn(Optional.of(user));
+        when(commentRepo.findByUserIdAndBookId(any(UUID.class), any(UUID.class)))
+                .thenReturn(null);
+        when(bookRepo.findById(any(UUID.class)))
+                .thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class,
+                () -> bookService.saveComment(new CommentDTO(UUID.randomUUID(), 3, "wassup")));
+    }
+
+    @Test
+    void saveCommentUserHasNotComment() {
+        User user = User.builder()
+                .personalCategories(new ArrayList<>(){{
+                    add(new Category());
+                }})
+                .build();
+
+        when(userService.getUserFromContextHolder())
+                .thenReturn(Optional.of(user));
+        when(commentRepo.findByUserIdAndBookId(any(UUID.class), any(UUID.class)))
+                .thenReturn(null);
+        when(bookRepo.findById(any(UUID.class)))
+                .thenReturn(Optional.of(new Book()));
+        var resp = (ResponseEntity<?>)bookService.saveComment(new CommentDTO(UUID.randomUUID(), 3, "wassup"));
+
+        assertEquals(HttpStatus.OK, resp.getStatusCode());
+        verify(commentRepo, times(1)).save(any(Comment.class));
+
     }
 }

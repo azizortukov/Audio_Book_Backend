@@ -6,6 +6,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,6 +24,8 @@ public class JwtUtil {
 
     private final MailService mailService;
     private final ObjectMapper jacksonObjectMapper;
+    @Value("${jwt.secret.key}")
+    private String secretKey;
     Random random = new Random();
 
     public String genToken(UserDetails userDetails) {
@@ -38,7 +41,7 @@ public class JwtUtil {
     }
 
     private SecretKey genKey() {
-        byte[] key = Decoders.BASE64.decode("g23a567x91a34v67h91234n678g123a5q7h912l456d8912o45t78s123p56a89e");
+        byte[] key = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(key);
     }
 
