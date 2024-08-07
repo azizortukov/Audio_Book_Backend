@@ -27,7 +27,7 @@ public class RefreshController {
             summary = "Refresh access token API",
             description = """
             This API receives refresh token and responds with access token.Response
-            will be 200 (good status) or 403 (forbidden) when refresh token itself
+            will be 200 (good status) or 401 (unauthorized) when refresh token itself
             is expired""")
     @GetMapping
     public HttpEntity<?> refresh() {

@@ -4,8 +4,6 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -35,7 +33,7 @@ public class BookServiceImpl implements BookService {
     private final CategoryRepo categoryRepo;
     private final UserService userService;
     private final CommentRepo commentRepo;
-
+    private final S3Service s3Service;
 
     @Override
     public HttpEntity<?> getBooksProjection() {
@@ -78,11 +76,15 @@ public class BookServiceImpl implements BookService {
                 .title(title)
                 .author(author)
                 .description(description)
-                .photo(photo.getBytes())
-                .pdf(pdf.getBytes())
-                .audio(audio.getBytes())
                 .categories(categories)
                 .build();
+        bookRepo.save(book);
+        String photoUrl = s3Service.uploadFile(photo);
+        String audioUrl = s3Service.uploadFile(audio);
+        String pdfUrl = s3Service.uploadFile(pdf);
+        book.setPhotoUrl(photoUrl);
+        book.setAudioUrl(audioUrl);
+        book.setPdfUrl(pdfUrl);
         return ResponseEntity.ok(bookRepo.save(book));
     }
 
@@ -97,18 +99,11 @@ public class BookServiceImpl implements BookService {
         if (bookById.isEmpty()) {
             throw new NotFoundException("Sorry, book is not found!");
         }
-        if (bookById.get().getPhoto() == null) {
+        if (bookById.get().getPhotoUrl() == null || bookById.get().getPhotoUrl().isEmpty()) {
             throw new ContentNotFound("Sorry, book image is not found!");
         }
-        Book book = bookById.get();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.IMAGE_JPEG);
-        headers.setContentLength(book.getPhoto().length);
-
         return ResponseEntity.ok()
-                .headers(headers)
-                .contentType(MediaType.IMAGE_JPEG)
-                .body(book.getPhoto());
+                .body(bookById.get().getPhotoUrl());
     }
 
     @Override
@@ -117,17 +112,11 @@ public class BookServiceImpl implements BookService {
         if (bookById.isEmpty()) {
             throw new NotFoundException("Sorry, book is not found!");
         }
-        if (bookById.get().getPdf() == null) {
+        if (bookById.get().getPdfUrl() == null || bookById.get().getPdfUrl().isEmpty()) {
             throw new ContentNotFound("Sorry, book pdf file is not found!");
         }
-        Book book = bookById.get();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_PDF);
-        headers.setContentLength(book.getPdf().length);
         return ResponseEntity.ok()
-                .headers(headers)
-                .contentType(MediaType.APPLICATION_PDF)
-                .body(book.getPdf());
+                .body(bookById.get().getPdfUrl());
     }
 
     @Override
@@ -136,18 +125,11 @@ public class BookServiceImpl implements BookService {
         if (bookById.isEmpty()) {
             throw new NotFoundException("Sorry, book is not found!");
         }
-        if (bookById.get().getAudio() == null) {
+        if (bookById.get().getAudioUrl() == null || bookById.get().getAudioUrl().isEmpty()) {
             throw new ContentNotFound("Sorry, book audio file is not found!");
         }
-        Book book = bookById.get();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-        headers.setContentDispositionFormData("attachment", book.getTitle() + ".mp3");
-        headers.setContentLength(book.getAudio().length);
         return ResponseEntity.ok()
-                .headers(headers)
-                .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .body(book.getAudio());
+                .body(bookById.get().getAudioUrl());
     }
 
     @Override

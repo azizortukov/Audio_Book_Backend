@@ -23,7 +23,7 @@ public class BookController {
             summary = "Getting all books Page API",
             description = """
                     This API returns all the books. The response are 200 (success)
-                    , 403 (forbidden or token is expired)""")
+                    , 403 (forbidden) or 401 (unauthorized) token is expired""")
     @GetMapping
     public HttpEntity<?> getBooks() {
         return bookService.getBooksProjection();
@@ -33,7 +33,7 @@ public class BookController {
             summary = "Getting home Page API",
             description = """
                     This API returns books for Home page of User. The response are 200 (success)
-                    , 403 (forbidden or token is expired)
+                    , 403 (forbidden) or 401 (unauthorized) token is expired
                     """)
     @GetMapping("/home")
     public HttpEntity<?> home() {
@@ -44,7 +44,7 @@ public class BookController {
             summary = "Searching books API",
             description = """
                     This API returns books for searched result that matches with author
-                    name or book title. The response are 200 (success), 403 (forbidden or token is expired).
+                    name or book title. The response are 200 (success), 403 (forbidden) or 401 (unauthorized) token is expired.
                     """)
     @GetMapping("/search/{search}")
     public HttpEntity<?> search(@PathVariable String search) {
@@ -55,7 +55,7 @@ public class BookController {
             summary = "Getting book details with comments by id",
             description = """
                     This API returns book's details with comments which will be matched. The responses are
-                     200 (success), 403 (forbidden or token is expired).
+                     200 (success), 403 (forbidden) or 401 (unauthorized) token is expired.
                     """)
     @GetMapping("{id}")
     public HttpEntity<?> getSelected(@PathVariable UUID id) {
@@ -66,7 +66,7 @@ public class BookController {
             summary = "Leaving comment for a book",
             description = """
                     This API receives DTO of comment which has book id, rating that user left and comment boyd
-                    if user left it. The responses are 200 (success), 403 (forbidden or token is expired).
+                    if user left it. The responses are 200 (success), 403 (forbidden) or 401 (unauthorized) token is expired.
                     """)
     @PostMapping("comment")
     public HttpEntity<?> addComment(@RequestBody @Valid CommentDTO commentDTO) {

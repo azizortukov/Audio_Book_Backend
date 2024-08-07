@@ -25,7 +25,7 @@ public class GlobalExceptionHandler {
                 .body(new ExceptionResponse(
                         HttpStatus.INTERNAL_SERVER_ERROR,
                         "Something wrong happened in the server",
-                        LocalDateTime.now()));
+                        LocalDateTime.now().toString()));
     }
 
     @ExceptionHandler(NotFoundException.class)
@@ -36,7 +36,7 @@ public class GlobalExceptionHandler {
                 .body(new ExceptionResponse(
                         HttpStatus.NOT_FOUND,
                         e.getMessage(),
-                        LocalDateTime.now()
+                        LocalDateTime.now().toString()
                 ));
     }
 
@@ -48,7 +48,7 @@ public class GlobalExceptionHandler {
                 .body(new ExceptionResponse(
                         HttpStatus.BAD_REQUEST,
                         e.getMessage(),
-                        LocalDateTime.now()
+                        LocalDateTime.now().toString()
                 ));
     }
 
@@ -60,7 +60,7 @@ public class GlobalExceptionHandler {
                 .body(new ExceptionResponse(
                         HttpStatus.UNAUTHORIZED,
                         e.getMessage(),
-                        LocalDateTime.now()
+                        LocalDateTime.now().toString()
                 ));
     }
 
@@ -72,7 +72,7 @@ public class GlobalExceptionHandler {
                 .body(new ExceptionResponse(
                         HttpStatus.UNAUTHORIZED,
                         e.getMessage(),
-                        LocalDateTime.now()
+                        LocalDateTime.now().toString()
                 ));
     }
 
@@ -81,7 +81,11 @@ public class GlobalExceptionHandler {
         log.warn(e.getMessage());
         return ResponseEntity
                 .status(HttpStatus.NO_CONTENT)
-                .body(null);
+                .body(new ExceptionResponse(
+                        HttpStatus.NO_CONTENT,
+                        e.getMessage(),
+                        LocalDateTime.now().toString()
+                ));
     }
 
     @ExceptionHandler(NullPointerException.class)
@@ -89,11 +93,15 @@ public class GlobalExceptionHandler {
         log.warn(e.getMessage());
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body("Param cannot be null!");
+                .body(new ExceptionResponse(
+                        HttpStatus.BAD_REQUEST,
+                        "Param cannot be null!",
+                        LocalDateTime.now().toString()
+                ));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<?> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+    public HttpEntity<?> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         Map<String, Object> errors = new HashMap<>();
 
         e.getBindingResult().getAllErrors().forEach(error -> {
@@ -108,7 +116,7 @@ public class GlobalExceptionHandler {
                 .body(new ExceptionResponse(
                         HttpStatus.BAD_REQUEST,
                         "Check data's format",
-                        LocalDateTime.now(),
+                        LocalDateTime.now().toString(),
                         errors));
     }
 

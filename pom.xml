@@ -105,6 +105,14 @@
             <artifactId>javafaker</artifactId>
             <version>1.0.2</version>
         </dependency>
+
+<!--        AWS S3 Bucket service dependency-->
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-s3</artifactId>
+            <version>1.12.375</version>
+        </dependency>
+
     </dependencies>
 
     <build>

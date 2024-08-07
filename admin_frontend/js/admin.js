@@ -28,19 +28,23 @@ function getBooks() {
         })
         document.getElementById('tbody').innerHTML = innerHtml;
     }).catch(e => {
-        axios({
-            url:  prefixUrl + '/api/refresh',
-            method: 'GET',
-            headers: {
-                'Authorization': localStorage.getItem('refreshToken')
-            }
-        }).then(resp => {
-            console.log(resp.data);
-            localStorage.setItem('accessToken', resp.data.accessToken)
-            getBooks()
-        }).catch(e => {
-            window.location.href = 'login.html'
-        })
+        if (e.response.status == 403) {
+            axios({
+                url:  prefixUrl + '/api/refresh',
+                method: 'GET',
+                headers: {
+                    'Authorization': localStorage.getItem('refreshToken')
+                }
+            }).then(resp => {
+                console.log(resp.data);
+                localStorage.setItem('accessToken', resp.data.accessToken)
+                getBooks()
+            }).catch(e => {
+                window.location.href = 'login.html'
+            })
+        } else {
+            alert("You don't have access!")
+        }
     })
 }
 
