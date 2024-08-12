@@ -24,7 +24,7 @@ public class JwtUtil {
 
     private final MailService mailService;
     private final ObjectMapper jacksonObjectMapper;
-    @Value("${jwt.secretKey}")
+    @Value("${keys.jwt}")
     private String secretKey;
     Random random = new Random();
 

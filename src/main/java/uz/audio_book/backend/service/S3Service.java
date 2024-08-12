@@ -19,11 +19,11 @@ public class S3Service {
 
     private final AmazonS3 amazonS3;
 
-    @Value("${aws.s3.bucketName}")
+    @Value("${keys.bucket-name}")
     private String bucketName;
 
     public String uploadFile(@NonNull MultipartFile file) {
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("уУуу-MM-dd");
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("уyуу-MM-dd");
         String todayDate = dateTimeFormatter.format(LocalDate.now());
         try {
             ObjectMetadata objectMetadata = new ObjectMetadata();
