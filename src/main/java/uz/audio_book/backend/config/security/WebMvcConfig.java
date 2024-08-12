@@ -1,4 +1,4 @@
-package uz.audio_book.backend.config;
+package uz.audio_book.backend.config.security;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;

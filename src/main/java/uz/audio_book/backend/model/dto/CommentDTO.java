@@ -1,4 +1,4 @@
-package uz.audio_book.backend.dto;
+package uz.audio_book.backend.model.dto;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.NonNull;

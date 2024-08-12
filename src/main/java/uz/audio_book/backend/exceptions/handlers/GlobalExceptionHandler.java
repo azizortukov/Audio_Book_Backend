@@ -1,4 +1,4 @@
-package uz.audio_book.backend.exceptions;
+package uz.audio_book.backend.exceptions.handlers;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
@@ -8,6 +8,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import uz.audio_book.backend.exceptions.*;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;

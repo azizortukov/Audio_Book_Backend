@@ -11,7 +11,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-import uz.audio_book.backend.dto.SignUpDTO;
+import uz.audio_book.backend.model.dto.SignUpDTO;
 import uz.audio_book.backend.service.MailService;
 
 import javax.crypto.SecretKey;
@@ -24,7 +24,7 @@ public class JwtUtil {
 
     private final MailService mailService;
     private final ObjectMapper jacksonObjectMapper;
-    @Value("${jwt.secretKey}")
+    @Value("${keys.jwt}")
     private String secretKey;
     Random random = new Random();
 

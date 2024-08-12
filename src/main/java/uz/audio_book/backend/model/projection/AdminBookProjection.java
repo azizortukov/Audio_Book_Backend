@@ -1,4 +1,4 @@
-package uz.audio_book.backend.projection;
+package uz.audio_book.backend.model.projection;
 
 import java.time.LocalDateTime;
 import java.util.List;

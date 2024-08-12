@@ -3,9 +3,9 @@ package uz.audio_book.backend.repo;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import uz.audio_book.backend.entity.Book;
-import uz.audio_book.backend.projection.AdminBookProjection;
-import uz.audio_book.backend.projection.BookProjection;
-import uz.audio_book.backend.projection.SelectedBookProjection;
+import uz.audio_book.backend.model.projection.AdminBookProjection;
+import uz.audio_book.backend.model.projection.BookProjection;
+import uz.audio_book.backend.model.projection.SelectedBookProjection;
 
 import java.util.List;
 import java.util.UUID;

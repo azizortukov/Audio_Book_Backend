@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import uz.audio_book.backend.dto.LoginDTO;
-import uz.audio_book.backend.dto.SignUpDTO;
+import uz.audio_book.backend.model.dto.LoginDTO;
+import uz.audio_book.backend.model.dto.SignUpDTO;
 import uz.audio_book.backend.service.JwtService;
 
 @RestController

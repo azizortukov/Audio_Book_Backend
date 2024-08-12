@@ -8,9 +8,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import uz.audio_book.backend.dto.LoginDTO;
-import uz.audio_book.backend.dto.SignUpDTO;
-import uz.audio_book.backend.dto.TokenDTO;
+import uz.audio_book.backend.model.dto.LoginDTO;
+import uz.audio_book.backend.model.dto.SignUpDTO;
+import uz.audio_book.backend.model.dto.TokenDTO;
 import uz.audio_book.backend.entity.User;
 import uz.audio_book.backend.exceptions.BadRequestException;
 import uz.audio_book.backend.exceptions.HeaderException;

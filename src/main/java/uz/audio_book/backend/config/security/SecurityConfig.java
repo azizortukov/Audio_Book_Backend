@@ -1,4 +1,4 @@
-package uz.audio_book.backend.config;
+package uz.audio_book.backend.config.security;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

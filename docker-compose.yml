@@ -2,7 +2,7 @@ services:
   spring-boot-app:
     image: anasortukov/audio-book
     ports:
-      - "8080:8080"
+      - "80:8080"
     depends_on:
       postgres-db:
         condition: service_healthy
@@ -18,3 +18,8 @@ services:
       test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 5s
       retries: 10
+
+  redis-db:
+    image: redis
+    ports:
+      - "6300:6379"

@@ -1,6 +1,9 @@
 package uz.audio_book.backend.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
@@ -9,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import uz.audio_book.backend.service.BookService;
 import uz.audio_book.backend.service.UserService;
+
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -60,6 +64,9 @@ public class FileController {
                     This API sends profile photo of logged in user. The responses are 200
                     (success) with profile photo, 404 (not found)
                     , 204 (no content) meaning user doesn't have profile image.""")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved", content = @Content(mediaType = "image/jpeg"))
+    })
     @GetMapping("/user")
     public HttpEntity<?> getImage() {
         return userService.getUserPhoto();

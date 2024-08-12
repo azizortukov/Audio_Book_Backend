@@ -6,7 +6,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.web.bind.annotation.*;
-import uz.audio_book.backend.dto.CommentDTO;
+import uz.audio_book.backend.model.dto.CommentDTO;
 import uz.audio_book.backend.service.BookService;
 
 import java.util.UUID;

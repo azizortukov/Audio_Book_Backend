@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.web.bind.annotation.*;
-import uz.audio_book.backend.dto.UserDetailsDTO;
+import uz.audio_book.backend.model.dto.UserDetailsDTO;
 import uz.audio_book.backend.service.UserService;
 
 @RequiredArgsConstructor

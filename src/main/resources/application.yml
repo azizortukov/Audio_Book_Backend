@@ -1,24 +1,39 @@
+
 spring:
+
   datasource:
-#    url: jdbc:postgresql://localhost:5432/audio_book
-    url: jdbc:postgresql://postgres-db:5432/postgres
-    username: postgres
-    password: root123
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
     driverClassName: org.postgresql.Driver
+
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
+
   mail:
     host: smtp.gmail.com
     port: 587
-    username: your@email.address
-    password: your_password
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
     properties:
       mail:
         smtp:
           auth: true
           starttls:
             enable: true
+
   servlet:
     multipart:
       max-file-size: 20MB
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+keys:
+  jwt: ${JWT_SECRET_KEY}
+  aws:
+    access: ${AWS_S3_ACCESS_KEY}
+    secret: ${AWS_S3_SECRET_KEY}
+  bucket-name: ${AWS_S3_BUCKET_NAME}

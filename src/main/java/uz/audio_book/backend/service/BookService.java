@@ -3,7 +3,7 @@ package uz.audio_book.backend.service;
 import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import uz.audio_book.backend.dto.CommentDTO;
+import uz.audio_book.backend.model.dto.CommentDTO;
 
 import java.util.List;
 import java.util.UUID;
