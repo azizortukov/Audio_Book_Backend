@@ -16,6 +16,9 @@ public interface BookRepo extends JpaRepository<Book, UUID> {
             SELECT b.id,
                    b.title,
                    b.author,
+                   b.photo_url,
+                   b.audio_url,
+                   b.pdf_url,
                    ARRAY_AGG(DISTINCT bc.categories_id) AS categoryIds,
                    ROUND((SELECT SUM(c.rating) * 1.0 / COUNT(*)
                           FROM comment c
@@ -30,6 +33,9 @@ public interface BookRepo extends JpaRepository<Book, UUID> {
             SELECT b.id,
                    b.title,
                    b.author,
+                   b.photo_url,
+                   b.audio_url,
+                   b.pdf_url,
                    ARRAY_AGG(DISTINCT bc.categories_id) AS categoryIds,
                    ROUND((SELECT SUM(c.rating) * 1.0 / COUNT(*)
                           FROM comment c
@@ -46,6 +52,9 @@ public interface BookRepo extends JpaRepository<Book, UUID> {
             SELECT b.id,
                    b.title,
                    b.author,
+                   b.photo_url,
+                   b.audio_url,
+                   b.pdf_url,
                    ARRAY_AGG(DISTINCT bc.categories_id) AS categoryIds,
                    ROUND((SELECT SUM(c.rating) * 1.0 / COUNT(*)
                           FROM comment c
@@ -62,6 +71,9 @@ public interface BookRepo extends JpaRepository<Book, UUID> {
             SELECT b.id,
                    b.title,
                    b.author,
+                   b.photo_url,
+                   b.audio_url,
+                   b.pdf_url,
                    ARRAY_AGG(DISTINCT bc.categories_id) AS categoryIds,
                    ROUND((SELECT SUM(c.rating) * 1.0 / COUNT(*)
                           FROM comment c
@@ -79,6 +91,9 @@ public interface BookRepo extends JpaRepository<Book, UUID> {
             SELECT b.id,
                    b.title,
                    b.author,
+                   b.photo_url,
+                   b.audio_url,
+                   b.pdf_url,
                    ARRAY_AGG(DISTINCT bc.categories_id) AS categoryIds,
                    ROUND((SELECT SUM(c.rating) * 1.0 / COUNT(*)
                           FROM comment c
@@ -106,6 +121,9 @@ public interface BookRepo extends JpaRepository<Book, UUID> {
             SELECT b.id,
                     b.title,
                     b.author,
+                    b.photo_url,
+                   b.audio_url,
+                   b.pdf_url,
                     ARRAY_AGG(DISTINCT ct.name) AS categoryNames,
                     ROUND((SELECT SUM(c.rating) * 1.0 / COUNT(*)
                            FROM comment c
@@ -123,6 +141,9 @@ public interface BookRepo extends JpaRepository<Book, UUID> {
              SELECT b.id,
                    b.title,
                    b.author,
+                   b.photo_url,
+                   b.audio_url,
+                   b.pdf_url,
                    ARRAY_AGG(DISTINCT ct.name) AS categoryNames,
                    ROUND((SELECT SUM(c.rating) * 1.0 / COUNT(*)
                           FROM comment c

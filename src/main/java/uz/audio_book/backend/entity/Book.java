@@ -24,11 +24,18 @@ public class Book {
     private String title;
     @Column(nullable = false)
     private String author;
+    @Lob
     @Column(columnDefinition = "TEXT")
     private String description;
-    private byte[] photo;
-    private byte[] audio;
-    private byte[] pdf;
+    @Lob
+    @Column(columnDefinition = "TEXT")
+    private String audioUrl;
+    @Lob
+    @Column(columnDefinition = "TEXT")
+    private String photoUrl;
+    @Lob
+    @Column(columnDefinition = "TEXT")
+    private String pdfUrl;
     @CreationTimestamp
     @Column(nullable = false)
     private LocalDateTime createdAt;
