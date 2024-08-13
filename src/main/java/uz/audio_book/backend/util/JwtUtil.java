@@ -83,21 +83,20 @@ public class JwtUtil {
         return Arrays.stream(authorities.split(",")).map(SimpleGrantedAuthority::new).collect(Collectors.toList());
     }
 
-    public String generateVerificationCodeToken(SignUpDTO user) {
-        user.setVerificationCode(genVerificationCode().toString());
+    public String genVerificationCodeToken(SignUpDTO user) {
+        Integer otp = genVerificationCode();
         Map<String, Object> claims = new HashMap<>();
         claims.put("email", user.getEmail());
         claims.put("password", user.getPassword());
-        claims.put("birthDate", user.getBirthDate());
-        claims.put("verificationCode", user.getVerificationCode());
-
-        mailService.sendConfirmationCode(user.getEmail(), user.getVerificationCode());
-        return genSignUpConfirmationToken(claims, user.getEmail());
+        claims.put("birth_date", user.getBirthDate());
+        mailService.sendConfirmationCode(user.getEmail(), otp.toString());
+        return genSignUpConfirmationToken(claims, user.getEmail(), otp.toString());
     }
 
-    public String genSignUpConfirmationToken(Map<String, Object> user, String email) {
+    public String genSignUpConfirmationToken(Map<String, Object> user, String email, String otp) {
         return "Confirmation " + Jwts.builder()
                 .claim("details", user)
+                .claims(Map.of("otp", otp))
                 .subject(email)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
@@ -106,14 +105,13 @@ public class JwtUtil {
     }
 
     private Integer genVerificationCode() {
-        int code = random.nextInt(101010, 989898);
-        System.out.println(code);
-        return code;
+        return random.nextInt(101010, 989898);
     }
 
     public boolean checkVerificationCodeFromDto(String verificationCode, String token) {
-        SignUpDTO user = getDtoFromToken(token);
-        return verificationCode.equals(user.getVerificationCode());
+        Claims claims = getClaims(token);
+        String otp = claims.get("otp", String.class);
+        return verificationCode.equals(otp);
     }
 
     public SignUpDTO getDtoFromToken(String token) {
@@ -137,10 +135,5 @@ public class JwtUtil {
     public boolean checkVerification(String verificationCode, String token) {
         Claims claims = getClaims(token);
         return verificationCode.equals(claims.get("confirmationCode", String.class));
-    }
-
-    public String getEmailFromToken(String token) {
-        Claims claims = getClaims(token);
-        return claims.getSubject();
     }
 }

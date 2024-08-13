@@ -25,10 +25,12 @@ import uz.audio_book.backend.filter.JwtFilter;
 public class SecurityConfig {
 
     private final CustomUserDetailsService customUserDetailsService;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtFilter jwtFilter) throws Exception {
         http.sessionManagement(m -> m.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        http.exceptionHandling(m -> m.authenticationEntryPoint(customAuthenticationEntryPoint));
         http.csrf(AbstractHttpConfigurer::disable);
         http.authorizeHttpRequests(m -> m
                 .requestMatchers("/api/auth/**").permitAll()

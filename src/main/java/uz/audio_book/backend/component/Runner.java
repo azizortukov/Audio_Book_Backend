@@ -1,6 +1,5 @@
 package uz.audio_book.backend.component;
 
-import com.github.javafaker.Faker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,7 +22,6 @@ public class Runner implements CommandLineRunner {
     private final CategoryRepo categoryRepo;
     private final PasswordEncoder passwordEncoder;
     private final UserRepo userRepo;
-    private final Faker faker;
 
     @Override
     public void run(String... args) {
@@ -36,9 +34,21 @@ public class Runner implements CommandLineRunner {
         }
         if (categoryRepo.findAll().isEmpty() && userRepo.findAll().isEmpty()) {
             List<Category> categories = new ArrayList<>();
+            List<String> categoryNames = List.of(
+                    "Fiction",
+                    "Non-Fiction",
+                    "Mystery",
+                    "Fantasy",
+                    "Science Fiction",
+                    "Romance",
+                    "Historical",
+                    "Self-Help",
+                    "IELTS Preparation",
+                    "Biography"
+            );
             for (int i = 0; i < 10; i++) {
                 Category category = categoryRepo.save(Category.builder()
-                        .name(faker.book().genre())
+                        .name(categoryNames.get(i))
                         .build());
                 categories.add(category);
             }

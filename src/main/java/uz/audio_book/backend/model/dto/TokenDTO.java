@@ -1,4 +1,10 @@
 package uz.audio_book.backend.model.dto;
 
-public record TokenDTO(String accessToken, String refreshToken) {
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public record TokenDTO(
+        @JsonProperty("access_token")
+        String accessToken,
+        @JsonProperty("refresh_token")
+        String refreshToken) {
 }

@@ -16,7 +16,7 @@ public interface UserService {
 
     User save(User user);
 
-    Optional<User> getUserFromContextHolder();
+    User getUserFromContextHolder();
 
     Optional<User> findByEmail(String email);
 

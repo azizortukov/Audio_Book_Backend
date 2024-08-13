@@ -10,22 +10,23 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
-import uz.audio_book.backend.model.dto.CommentDTO;
 import uz.audio_book.backend.entity.Book;
 import uz.audio_book.backend.entity.Category;
 import uz.audio_book.backend.entity.Comment;
 import uz.audio_book.backend.entity.User;
-import uz.audio_book.backend.exceptions.ContentNotFound;
 import uz.audio_book.backend.exceptions.NotFoundException;
-import uz.audio_book.backend.exceptions.UserNotFoundException;
+import uz.audio_book.backend.model.dto.BookCommentDTO;
+import uz.audio_book.backend.model.dto.BookHomeDTO;
+import uz.audio_book.backend.model.dto.CommentDTO;
 import uz.audio_book.backend.model.projection.BookProjection;
-import uz.audio_book.backend.model.projection.CommentProjection;
 import uz.audio_book.backend.model.projection.SelectedBookProjection;
 import uz.audio_book.backend.repo.BookRepo;
 import uz.audio_book.backend.repo.CategoryRepo;
 import uz.audio_book.backend.repo.CommentRepo;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -45,7 +46,7 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public HttpEntity<?> getHomeData() {
-        User user = userService.getUserFromContextHolder().get();
+        User user = userService.getUserFromContextHolder();
         List<UUID> ids = user.getPersonalCategories().stream().map(Category::getId).toList();
 
         List<BookProjection> newRelease = bookRepo.findNewRelease();
@@ -57,12 +58,7 @@ public class BookServiceImpl implements BookService {
         } else {
             recommended = bookRepo.findByPersonalCategories(ids);
         }
-        Map<String, Object> result = new LinkedHashMap<>();
-        result.put("recommended", recommended);
-        result.put("best-seller", bestSeller);
-        result.put("new-release", newRelease);
-        result.put("trending-now", trendingNow);
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(new BookHomeDTO(newRelease, trendingNow, bestSeller, recommended));
     }
 
     @Override
@@ -98,7 +94,7 @@ public class BookServiceImpl implements BookService {
             throw new NotFoundException("Sorry, book is not found!");
         }
         if (bookById.get().getPhoto() == null) {
-            throw new ContentNotFound("Sorry, book image is not found!");
+            return ResponseEntity.noContent().build();
         }
         Book book = bookById.get();
         HttpHeaders headers = new HttpHeaders();
@@ -118,7 +114,7 @@ public class BookServiceImpl implements BookService {
             throw new NotFoundException("Sorry, book is not found!");
         }
         if (bookById.get().getPdf() == null) {
-            throw new ContentNotFound("Sorry, book pdf file is not found!");
+            return ResponseEntity.noContent().build();
         }
         Book book = bookById.get();
         HttpHeaders headers = new HttpHeaders();
@@ -137,7 +133,7 @@ public class BookServiceImpl implements BookService {
             throw new NotFoundException("Sorry, book is not found!");
         }
         if (bookById.get().getAudio() == null) {
-            throw new ContentNotFound("Sorry, book audio file is not found!");
+            return ResponseEntity.noContent().build();
         }
         Book book = bookById.get();
         HttpHeaders headers = new HttpHeaders();
@@ -162,21 +158,15 @@ public class BookServiceImpl implements BookService {
         if (!bookRepo.existsById(id)) {
             throw new NotFoundException("Sorry, book is not found!");
         }
-        SelectedBookProjection book = bookRepo.findSelectedBookByDetails(id);
-        List<CommentProjection> bookComments = commentRepo.findByBookId(id);
-        Map<Object, Object> result = new LinkedHashMap<>();
-        result.put("book", book);
-        result.put("comments", bookComments);
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(new BookCommentDTO(
+                bookRepo.findSelectedBookByDetails(id),
+                commentRepo.findByBookId(id))
+        );
     }
 
     @Override
     public HttpEntity<?> saveComment(@RequestBody CommentDTO commentDTO) {
-        Optional<User> userOpt = userService.getUserFromContextHolder();
-        if (userOpt.isEmpty()) {
-            throw new UserNotFoundException("Sorry, user's session is expired!");
-        }
-        User user = userOpt.get();
+        User user = userService.getUserFromContextHolder();
         // Checking if user left comment before, if yes then comment will be updated, if no then
         // new comment will be added
         Comment comment = commentRepo.findByUserIdAndBookId(user.getId(), commentDTO.bookId());
@@ -196,6 +186,6 @@ public class BookServiceImpl implements BookService {
                     .body(commentDTO.body())
                     .build());
         }
-        return ResponseEntity.ok("success");
+        return ResponseEntity.noContent().build();
     }
 }

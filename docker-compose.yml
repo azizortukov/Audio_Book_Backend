@@ -4,8 +4,8 @@ services:
     ports:
       - "80:8080"
     depends_on:
-      postgres-db:
-        condition: service_healthy
+      - postgres-db
+
   postgres-db:
     image: anasortukov/postgres-db
     environment:
@@ -14,10 +14,6 @@ services:
       POSTGRES_PASSWORD: root123
     ports:
       - "5433:5432"
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
-      interval: 5s
-      retries: 10
 
   redis-db:
     image: redis

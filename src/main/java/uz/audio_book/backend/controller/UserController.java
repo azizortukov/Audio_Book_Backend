@@ -1,11 +1,17 @@
 package uz.audio_book.backend.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.web.bind.annotation.*;
+import uz.audio_book.backend.exceptions.ExceptionResponse;
 import uz.audio_book.backend.model.dto.UserDetailsDTO;
+import uz.audio_book.backend.model.projection.UserDetailsProjection;
 import uz.audio_book.backend.service.UserService;
 
 @RequiredArgsConstructor
@@ -16,23 +22,31 @@ public class UserController {
 
     private final UserService userService;
 
-    @Operation(
-            summary = "User Info API",
-            description = """
-                    This API sends info about user who is logged in. The responses are
-                    200 (success) with user details, 403(forbidden) user is not logged in""")
+    @Operation(summary = "User Info API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User's profile data is returned", content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = UserDetailsProjection.class))),
+            @ApiResponse(responseCode = "401", description = "Authorization token is invalid or expired",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
+    })
     @GetMapping("/me")
     public HttpEntity<?> getUserById() {
         return userService.getUserDetails();
     }
 
-@Operation(
-        summary = "User Info Update API",
-        description = """
-                    This API receives new info about user who is logged in. Response will be
-                    200 (success) when user details are updated, 400 (bad request) if sent
-                    birth date format is wrong, 400 (bad request) birth date format is wrong,
-                    403 user is not logged in""")
+
+    @Operation(summary = "User Info Update API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User's profile data successfully uploaded"),
+            @ApiResponse(responseCode = "400", description = "Param is invalid or not provided", content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = ExceptionResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Authorization token is invalid or expired",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class)))
+    })
     @PutMapping("/edit")
     public HttpEntity<?> updateUser(@RequestBody UserDetailsDTO userDetailsDTO) {
         return userService.updateUserDetails(userDetailsDTO);

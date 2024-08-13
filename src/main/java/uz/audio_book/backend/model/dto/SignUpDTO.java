@@ -1,5 +1,6 @@
 package uz.audio_book.backend.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -16,7 +17,8 @@ public class SignUpDTO {
     private String email;
     @NotBlank(message = "Password cannot be blank")
     private String password;
+    @JsonProperty("birth_date")
     @NotBlank(message = "Birth date cannot be blank")
     private String birthDate;
-    private String verificationCode;
+
 }
