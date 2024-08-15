@@ -24,16 +24,12 @@ public class Book {
     private String title;
     @Column(nullable = false)
     private String author;
-    @Lob
     @Column(columnDefinition = "TEXT")
     private String description;
-    @Lob
     @Column(columnDefinition = "TEXT")
     private String audioUrl;
-    @Lob
     @Column(columnDefinition = "TEXT")
     private String photoUrl;
-    @Lob
     @Column(columnDefinition = "TEXT")
     private String pdfUrl;
     @CreationTimestamp

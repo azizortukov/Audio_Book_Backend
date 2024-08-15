@@ -3,8 +3,6 @@ package uz.audio_book.backend.service;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,6 +28,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepo userRepo;
     private final PasswordEncoder passwordEncoder;
     private final RoleServiceImpl roleServiceImpl;
+    private final S3Service s3Service;
 
     @Override
     public User saveUserFromDto(SignUpDTO dto) {
@@ -74,8 +73,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public HttpEntity<?> updateUserPhoto(MultipartFile file) {
         User user = getUserFromContextHolder();
-        user.setProfilePhoto(file.getBytes());
-        userRepo.save(user);
+        s3Service.uploadProfilePhoto(file, user);
         return ResponseEntity.noContent().build();
     }
 
@@ -83,18 +81,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public HttpEntity<?> getUserPhoto() {
         User user = getUserFromContextHolder();
-        try {
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.IMAGE_JPEG);
-            headers.setContentLength(user.getProfilePhoto().length);
-            return ResponseEntity.ok()
-                    .headers(headers)
-                    .contentType(MediaType.IMAGE_JPEG)
-                    .body(user.getProfilePhoto());
-        } catch (NullPointerException e) {
+        if (user.getProfilePhotoUrl() == null || user.getProfilePhotoUrl().isEmpty()) {
             return ResponseEntity.noContent().build();
         }
-
+        return ResponseEntity.ok().body(user.getProfilePhotoUrl());
     }
 
     @Override

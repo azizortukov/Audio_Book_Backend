@@ -31,7 +31,8 @@ public class User implements UserDetails {
     private String password;
     private LocalDate birthDate;
     private String displayName;
-    private byte[] profilePhoto;
+    @Column(columnDefinition = "TEXT")
+    private String profilePhotoUrl;
     @ManyToMany(fetch = FetchType.EAGER)
     private List<Category> personalCategories;
     @ManyToMany(fetch = FetchType.EAGER)

@@ -75,12 +75,9 @@ public class BookServiceImpl implements BookService {
                 .categories(categories)
                 .build();
         bookRepo.save(book);
-        String photoUrl = s3Service.uploadFile(photo);
-        String audioUrl = s3Service.uploadFile(audio);
-        String pdfUrl = s3Service.uploadFile(pdf);
-        book.setPhotoUrl(photoUrl);
-        book.setAudioUrl(audioUrl);
-        book.setPdfUrl(pdfUrl);
+        s3Service.uploadPhoto(photo, book);
+        s3Service.uploadAudio(audio, book);
+        s3Service.uploadPDF(pdf, book);
         return ResponseEntity.ok(bookRepo.save(book));
     }
 

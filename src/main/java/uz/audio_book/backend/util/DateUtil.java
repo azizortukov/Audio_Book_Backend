@@ -2,18 +2,19 @@ package uz.audio_book.backend.util;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.time.format.DateTimeParseException;
 
 public class DateUtil {
 
-    private static final String DATE_PATTERN = "^\\d{4}-\\d{2}-\\d{2}$";
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     public static boolean isValidFormat(String dateStr) {
-        Pattern pattern = Pattern.compile(DATE_PATTERN);
-        Matcher matcher = pattern.matcher(dateStr);
-        return matcher.matches();
+        try {
+            LocalDate.parse(dateStr, formatter);
+            return true;
+        } catch (DateTimeParseException e) {
+            return false;
+        }
     }
 
     public static LocalDate parse(String date) {

@@ -12,5 +12,7 @@ public interface UserDetailsProjection {
     String getEmail();
     @JsonProperty("birth_date")
     String getBirthDate();
+    @JsonProperty("profile_photo_url")
+    String getProfilePhotoUrl();
 
 }
