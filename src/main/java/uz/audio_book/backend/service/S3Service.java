@@ -25,21 +25,16 @@ public class S3Service {
     private final AmazonS3 amazonS3;
     private final BookRepo bookRepo;
     private final UserRepo userRepo;
+    private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("уyуу-MM-dd");
 
     @Value("${keys.bucket-name}")
     private String bucketName;
 
     @Async
     public void uploadPhoto(@NotNull MultipartFile file, @NotNull Book book) {
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("уyуу-MM-dd");
-        String todayDate = dateTimeFormatter.format(LocalDate.now());
         try {
-            ObjectMetadata objectMetadata = new ObjectMetadata();
-            objectMetadata.setContentType(file.getContentType());
-            objectMetadata.setContentLength(file.getSize());
-            String fileName = todayDate + "/" + file.getOriginalFilename();
-            amazonS3.putObject(new PutObjectRequest(bucketName, fileName, file.getInputStream(), objectMetadata));
-            String photoUrl = amazonS3.getUrl(bucketName, fileName).toString();
+            deleteFile(book.getPhotoUrl());
+            String photoUrl = uploadFile(file);
             book.setPhotoUrl(photoUrl);
             bookRepo.save(book);
         } catch (IOException e) {
@@ -49,15 +44,9 @@ public class S3Service {
 
     @Async
     public void uploadAudio(@NotNull MultipartFile file, @NotNull Book book) {
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("уyуу-MM-dd");
-        String todayDate = dateTimeFormatter.format(LocalDate.now());
         try {
-            ObjectMetadata objectMetadata = new ObjectMetadata();
-            objectMetadata.setContentType(file.getContentType());
-            objectMetadata.setContentLength(file.getSize());
-            String fileName = todayDate + "/" + file.getOriginalFilename();
-            amazonS3.putObject(new PutObjectRequest(bucketName, fileName, file.getInputStream(), objectMetadata));
-            String audioUrl = amazonS3.getUrl(bucketName, fileName).toString();
+            deleteFile(book.getAudioUrl());
+            String audioUrl = uploadFile(file);
             book.setAudioUrl(audioUrl);
             bookRepo.save(book);
         } catch (IOException e) {
@@ -67,15 +56,9 @@ public class S3Service {
 
     @Async
     public void uploadPDF(@NotNull MultipartFile file, @NotNull Book book) {
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("уyуу-MM-dd");
-        String todayDate = dateTimeFormatter.format(LocalDate.now());
         try {
-            ObjectMetadata objectMetadata = new ObjectMetadata();
-            objectMetadata.setContentType(file.getContentType());
-            objectMetadata.setContentLength(file.getSize());
-            String fileName = todayDate + "/" + file.getOriginalFilename();
-            amazonS3.putObject(new PutObjectRequest(bucketName, fileName, file.getInputStream(), objectMetadata));
-            String pdfUrl = amazonS3.getUrl(bucketName, fileName).toString();
+            deleteFile(book.getPdfUrl());
+            String pdfUrl = uploadFile(file);
             book.setPdfUrl(pdfUrl);
             bookRepo.save(book);
         } catch (IOException e) {
@@ -83,20 +66,31 @@ public class S3Service {
         }
     }
 
+    @Async
     public void uploadProfilePhoto(MultipartFile file, User user) {
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("уyуу-MM-dd");
-        String todayDate = dateTimeFormatter.format(LocalDate.now());
         try {
-            ObjectMetadata objectMetadata = new ObjectMetadata();
-            objectMetadata.setContentType(file.getContentType());
-            objectMetadata.setContentLength(file.getSize());
-            String fileName = todayDate + "/" + file.getOriginalFilename();
-            amazonS3.putObject(new PutObjectRequest(bucketName, fileName, file.getInputStream(), objectMetadata));
-            String profilePhotoUrl = amazonS3.getUrl(bucketName, fileName).toString();
+            deleteFile(user.getProfilePhotoUrl());
+            String profilePhotoUrl = uploadFile(file);
             user.setProfilePhotoUrl(profilePhotoUrl);
             userRepo.save(user);
         } catch (IOException e) {
             throw new RuntimeException("Error uploading file to S3", e);
+        }
+    }
+
+    private String uploadFile(@NotNull MultipartFile file) throws IOException {
+        String todayDate = dateTimeFormatter.format(LocalDate.now());
+        ObjectMetadata objectMetadata = new ObjectMetadata();
+        objectMetadata.setContentType(file.getContentType());
+        objectMetadata.setContentLength(file.getSize());
+        String fileName = todayDate + "/" + file.getOriginalFilename();
+        amazonS3.putObject(new PutObjectRequest(bucketName, fileName, file.getInputStream(), objectMetadata));
+        return amazonS3.getUrl(bucketName, fileName).toString();
+    }
+
+    private void deleteFile(String fileName) {
+        if (fileName != null && !fileName.isEmpty() && amazonS3.doesObjectExist(bucketName, fileName)) {
+            amazonS3.deleteObject(bucketName, fileName);
         }
     }
 }

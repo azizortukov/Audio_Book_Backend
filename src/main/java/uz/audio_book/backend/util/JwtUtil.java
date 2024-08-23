@@ -1,6 +1,5 @@
 package uz.audio_book.backend.util;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -11,22 +10,19 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-import uz.audio_book.backend.model.dto.SignUpDTO;
-import uz.audio_book.backend.service.MailService;
 
 import javax.crypto.SecretKey;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
 public class JwtUtil {
 
-    private final MailService mailService;
-    private final ObjectMapper jacksonObjectMapper;
     @Value("${keys.jwt}")
     private String secretKey;
-    Random random = new Random();
 
     public String genToken(UserDetails userDetails) {
         String roles = userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.joining(","));
@@ -51,7 +47,7 @@ public class JwtUtil {
                 .subject(userDetails.getUsername())
                 .claim("authorities", roles)
                 .issuedAt(new Date())
-                .issuer("homework.io")
+                .issuer("audio.book")
                 .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 14))
                 .signWith(genKey())
                 .compact();
@@ -83,57 +79,13 @@ public class JwtUtil {
         return Arrays.stream(authorities.split(",")).map(SimpleGrantedAuthority::new).collect(Collectors.toList());
     }
 
-    public String genVerificationCodeToken(SignUpDTO user) {
-        Integer otp = genVerificationCode();
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("email", user.getEmail());
-        claims.put("password", user.getPassword());
-        claims.put("birth_date", user.getBirthDate());
-        mailService.sendConfirmationCode(user.getEmail(), otp.toString());
-        return genSignUpConfirmationToken(claims, user.getEmail(), otp.toString());
-    }
-
-    public String genSignUpConfirmationToken(Map<String, Object> user, String email, String otp) {
-        return "Confirmation " + Jwts.builder()
-                .claim("details", user)
-                .claims(Map.of("otp", otp))
+    public String genResetPasswordToken(String email) {
+        return Jwts.builder()
                 .subject(email)
-                .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
-                .signWith(genKey())
-                .compact();
-    }
-
-    private Integer genVerificationCode() {
-        return random.nextInt(101010, 989898);
-    }
-
-    public boolean checkVerificationCodeFromDto(String verificationCode, String token) {
-        Claims claims = getClaims(token);
-        String otp = claims.get("otp", String.class);
-        return verificationCode.equals(otp);
-    }
-
-    public SignUpDTO getDtoFromToken(String token) {
-        Claims claims = getClaims(token);
-        Map<String, Object> details = claims.get("details", Map.class);
-        return jacksonObjectMapper.convertValue(details, SignUpDTO.class);
-    }
-
-    public String generateCodeToken(String email) {
-        Integer verificationCode = genVerificationCode();
-        mailService.sendConfirmationCode(email, verificationCode.toString());
-        return "Confirmation " + Jwts.builder()
-                .subject(email)
-                .claim("confirmationCode", verificationCode.toString())
-                .issuedAt(new Date(System.currentTimeMillis()))
+                .issuedAt(new Date())
+                .issuer("audio.book")
                 .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 10))
                 .signWith(genKey())
                 .compact();
-    }
-
-    public boolean checkVerification(String verificationCode, String token) {
-        Claims claims = getClaims(token);
-        return verificationCode.equals(claims.get("confirmationCode", String.class));
     }
 }

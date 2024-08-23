@@ -6,7 +6,6 @@ import java.util.UUID;
 
 public interface UserDetailsProjection {
 
-    UUID getId();
     @JsonProperty("display_name")
     String getDisplayName();
     String getEmail();

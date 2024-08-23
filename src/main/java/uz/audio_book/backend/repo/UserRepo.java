@@ -13,9 +13,11 @@ public interface UserRepo extends JpaRepository<User, UUID> {
     Optional<User> findByEmail(String email);
 
     @Query(value = """
-            SELECT u.id, u.display_name, u.email ,u.birth_date, u.profile_photo_url FROM users u
+            SELECT u.display_name, u.email ,u.birth_date, u.profile_photo_url FROM users u
             WHERE u.id = :id LIMIT 1
             """, nativeQuery = true)
     UserDetailsProjection findByIdProjection(UUID id);
+
+    boolean existsByEmail(String email);
 
 }

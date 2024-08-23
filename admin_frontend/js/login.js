@@ -1,4 +1,4 @@
-let prefixUrl = 'http://localhost:8080';
+let prefixUrl = 'http://localhost';
 document.getElementById('loginForm').addEventListener('submit', function (event) {
     event.preventDefault();
 
@@ -15,8 +15,8 @@ document.getElementById('loginForm').addEventListener('submit', function (event)
         .then(response => {
 
             console.log(response.data)
-            localStorage.setItem('accessToken', response.data.accessToken)
-            localStorage.setItem('refreshToken', response.data.refreshToken)
+            localStorage.setItem('accessToken', response.data.access_token)
+            localStorage.setItem('refreshToken', response.data.refresh_token)
             window.location.href = 'admin.html';
         })
         .catch(error => {

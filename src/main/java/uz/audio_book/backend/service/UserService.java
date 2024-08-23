@@ -1,32 +1,32 @@
 package uz.audio_book.backend.service;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import uz.audio_book.backend.model.dto.SignUpDTO;
-import uz.audio_book.backend.model.dto.UserDetailsDTO;
 import uz.audio_book.backend.entity.User;
-
-import java.util.Optional;
+import uz.audio_book.backend.model.dto.*;
 
 @Service
 public interface UserService {
 
-    User saveUserFromDto(SignUpDTO dtoFromToken);
+    HttpEntity<?> cacheNewAccountDetails(@Valid SignUpDTO signUpDto);
 
-    User save(User user);
+    HttpEntity<?> verifyNewAccount(@Valid OTPVerifyDTO otpVerifyDTO);
+
+    HttpEntity<?> checkLoginDetails(@Valid LoginDTO loginDto);
+
+    HttpEntity<?> sendAccessLink(@Email(message = "Email format is not valid") @NotBlank(message = "Email cannot be blank") String email);
+
+    HttpEntity<?> changeUserPassword(@Valid ChangePasswordDTO changePasswordDTO, String token);
 
     User getUserFromContextHolder();
-
-    Optional<User> findByEmail(String email);
 
     HttpEntity<?> getUserDetails();
 
     HttpEntity<?> updateUserDetails(UserDetailsDTO userDetailsDTO);
 
-    HttpEntity<?> updateUserPhoto(MultipartFile file);
-
-    HttpEntity<?> getUserPhoto();
-
-    boolean existsByEmail(String email);
+    HttpEntity<?> updateUserProfileImage(MultipartFile profileImage);
 }
