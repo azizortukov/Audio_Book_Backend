@@ -2,6 +2,7 @@ package uz.audio_book.backend.repo;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 import uz.audio_book.backend.entity.User;
 import uz.audio_book.backend.model.projection.UserDetailsProjection;
 
@@ -19,5 +20,11 @@ public interface UserRepo extends JpaRepository<User, UUID> {
     UserDetailsProjection findByIdProjection(UUID id);
 
     boolean existsByEmail(String email);
+
+    @Transactional
+    @Query(value = """
+        DELETE FROM users_my_books where my_books_id = :bookId
+        """, nativeQuery = true)
+    void deleteMyBookById(UUID bookId);
 
 }

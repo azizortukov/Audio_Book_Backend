@@ -1,7 +1,9 @@
 package uz.audio_book.backend.repo;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 import uz.audio_book.backend.entity.Book;
 import uz.audio_book.backend.model.projection.AdminBookProjection;
 import uz.audio_book.backend.model.projection.BookProjection;
@@ -129,16 +131,16 @@ public interface BookRepo extends JpaRepository<Book, UUID> {
                            FROM comment c
                            WHERE c.book_id = b.id), 2) AS rating,
                     b.description
-             FROM book b
+            FROM book b
                      JOIN book_categories bc ON b.id = bc.book_id
                      LEFT JOIN comment c on b.id = c.book_id
                      JOIN category ct on bc.categories_id = ct.id
-             WHERE b.title ILIKE :searchBy OR b.author ILIKE :searchBy
-             GROUP BY b.id""", nativeQuery = true)
+            WHERE b.title ILIKE :searchBy OR b.author ILIKE :searchBy
+            GROUP BY b.id""", nativeQuery = true)
     List<SelectedBookProjection> findAllByAuthorOrTitle(String searchBy);
 
     @Query(value = """
-             SELECT b.id,
+            SELECT b.id,
                    b.title,
                    b.author,
                    b.photo_url,
@@ -156,4 +158,20 @@ public interface BookRepo extends JpaRepository<Book, UUID> {
             WHERE b.id =:id
             GROUP BY b.id""", nativeQuery = true)
     SelectedBookProjection findSelectedBookByDetails(UUID id);
+
+    @Modifying
+    @Transactional
+    @Query(value = """
+            DELETE FROM book_categories
+            WHERE categories_id = :categoryId
+            """, nativeQuery = true)
+    void deleteBookCategoryById(UUID categoryId);
+
+    @Modifying
+    @Transactional
+    @Query(value = """
+            DELETE FROM users_personal_categories
+            WHERE personal_categories_id = :categoryId
+            """, nativeQuery = true)
+    void deletePersonalCategoriesById(UUID categoryId);
 }

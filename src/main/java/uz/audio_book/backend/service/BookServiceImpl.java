@@ -21,6 +21,7 @@ import uz.audio_book.backend.model.projection.SelectedBookProjection;
 import uz.audio_book.backend.repo.BookRepo;
 import uz.audio_book.backend.repo.CategoryRepo;
 import uz.audio_book.backend.repo.CommentRepo;
+import uz.audio_book.backend.repo.UserRepo;
 
 import java.util.List;
 import java.util.Optional;
@@ -35,6 +36,7 @@ public class BookServiceImpl implements BookService {
     private final UserService userService;
     private final CommentRepo commentRepo;
     private final S3Service s3Service;
+    private final UserRepo userRepo;
 
     @Override
     public HttpEntity<?> getBooksProjection() {
@@ -78,50 +80,15 @@ public class BookServiceImpl implements BookService {
         s3Service.uploadPhoto(photo, book);
         s3Service.uploadAudio(audio, book);
         s3Service.uploadPDF(pdf, book);
-        return ResponseEntity.ok(bookRepo.save(book));
+        return ResponseEntity.noContent().build();
     }
 
     @Override
     public void deleteById(@NonNull UUID bookId) {
+        bookRepo.findById(bookId).orElseThrow(() -> new NotFoundException("Book not found"));
+        commentRepo.deleteByBookId(bookId);
+        userRepo.deleteMyBookById(bookId);
         bookRepo.deleteById(bookId);
-    }
-
-    @Override
-    public HttpEntity<?> sendBookPicture(@NonNull UUID bookId) {
-        Optional<Book> bookById = bookRepo.findById(bookId);
-        if (bookById.isEmpty()) {
-            throw new NotFoundException("Sorry, book is not found!");
-        }
-        if (bookById.get().getPhotoUrl() == null || bookById.get().getPhotoUrl().isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok()
-                .body(bookById.get().getPhotoUrl());
-    }
-
-    @Override
-    public HttpEntity<?> sendBookPDF(@NonNull UUID bookId) {
-        Optional<Book> bookById = bookRepo.findById(bookId);
-        if (bookById.isEmpty()) {
-            throw new NotFoundException("Sorry, book is not found!");
-        }
-        if (bookById.get().getPdfUrl() == null || bookById.get().getPdfUrl().isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok()
-                .body(bookById.get().getPdfUrl());
-    }
-
-    @Override
-    public HttpEntity<?> sendBookAudio(@NonNull UUID bookId) {
-        Optional<Book> bookById = bookRepo.findById(bookId);
-        if (bookById.isEmpty()) {
-            throw new NotFoundException("Sorry, book is not found!");
-        }
-        if (bookById.get().getAudioUrl() == null || bookById.get().getAudioUrl().isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok().body(bookById.get().getAudioUrl());
     }
 
     @Override
@@ -164,6 +131,33 @@ public class BookServiceImpl implements BookService {
                     .body(commentDTO.body())
                     .build());
         }
+        return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    public HttpEntity<?> updateBook(UUID bookId, String title, String author, String description, List<UUID> categoryIds, MultipartFile photo, MultipartFile audio, MultipartFile pdf) {
+        Optional<Book> bookOptional = bookRepo.findById(bookId);
+        if (bookOptional.isEmpty()) {
+            throw new NotFoundException("Sorry, book is not found!");
+        }
+        Book book = bookOptional.get();
+        book.setTitle(title != null ? title : book.getTitle());
+        book.setAuthor(author != null ? author : book.getAuthor());
+        book.setDescription(description != null ? description : book.getDescription());
+        if (!categoryIds.isEmpty()) {
+            List<Category> categories = categoryRepo.findAllById(categoryIds);
+            book.setCategories(categories);
+        }
+        if (photo != null && !photo.isEmpty()) {
+            s3Service.uploadPhoto(photo, book);
+        }
+        if (audio != null && !audio.isEmpty()) {
+            s3Service.uploadAudio(audio, book);
+        }
+        if (pdf != null && !pdf.isEmpty()) {
+            s3Service.uploadPDF(pdf, book);
+        }
+        bookRepo.save(book);
         return ResponseEntity.noContent().build();
     }
 }

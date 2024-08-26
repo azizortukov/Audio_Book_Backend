@@ -13,8 +13,6 @@ public interface BookService {
 
     HttpEntity<?> getBooksProjection();
 
-    HttpEntity<?> sendBookPicture(UUID bookId);
-
     HttpEntity<?> getHomeData();
 
     HttpEntity<?> getAdminProjection();
@@ -23,13 +21,11 @@ public interface BookService {
 
     void deleteById(UUID bookId);
 
-    HttpEntity<?> sendBookPDF(UUID bookId);
-
-    HttpEntity<?> sendBookAudio(UUID bookId);
-
     HttpEntity<?> getByAuthorOrTitle(String search);
 
     HttpEntity<?> getSelected(UUID id);
 
     HttpEntity<?> saveComment(CommentDTO commentDTO);
+
+    HttpEntity<?> updateBook(UUID bookId, String title, String author, String description, List<UUID> categoryIds, MultipartFile photo, MultipartFile audio, MultipartFile pdf);
 }

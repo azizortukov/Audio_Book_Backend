@@ -20,5 +20,7 @@ public interface CommentRepo extends JpaRepository<Comment, UUID> {
             where b.id = :id""", nativeQuery = true)
     List<CommentProjection> findByBookId(UUID id);
 
+    void deleteByBookId(UUID bookId);
+
     Comment findByUserIdAndBookId(UUID userId, UUID bookId);
 }
